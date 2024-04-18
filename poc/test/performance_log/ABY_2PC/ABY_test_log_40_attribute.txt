@@ -1,0 +1,35 @@
+AES performance: 6350.35 MiB/sec
+RTT: 0.0761875 ms
+Throughput: 2089.59 MiB/s
+Complexities: 
+Boolean Sharing: ANDs: 0 (1-bit) ; Depth: 0
+Total Vec AND: 0
+Total Non-Vec AND: 0
+XOR vals: 0 gates: 0
+Comb gates: 0, CombStruct gates: 0, Perm gates: 0, Subset gates: 0, Split gates: 0
+Yao: ANDs: 0 ; Depth: 0
+Reverse Yao: ANDs: 0 ; Depth: 0
+Arithmetic Sharing: MULs: 40 ; Depth: 3
+SP-LUT Sharing: OT-gates: Total OT gates = 0; Depth: 1
+Total number of gates: 83 Total depth: 3
+Timings: 
+Total =		1.879 ms
+Init =		188.544 ms
+CircuitGen =	0.038 ms
+Network =	0.377 ms
+BaseOTs =	491.694 ms
+Setup =		1.582 ms
+OTExtension =	1.561 ms
+Garbling =	0.002 ms
+Online =	0.296 ms
+
+Communication: 
+Total Sent / Rcv	46668  bytes / 46668 bytes
+BaseOTs Sent / Rcv	67604564  bytes / 67604564 bytes
+Setup Sent / Rcv	46148  bytes / 46148 bytes
+OTExtension Sent / Rcv	46148  bytes / 46148 bytes
+Garbling Sent / Rcv	0  bytes / 0 bytes
+Online Sent / Rcv	520  bytes / 520 bytes
+
+Circuit Result: 1087995158
+Verification Result: 22140

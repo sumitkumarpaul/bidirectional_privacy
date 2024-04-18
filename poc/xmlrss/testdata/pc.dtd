@@ -1,0 +1,56 @@
+<!--
+  ~ XMLRSS - A Java Crypto Provider for Redactable Signatures and their
+  ~ XML Signature encoding.
+  ~
+  ~ Copyright (c) 2017 Wolfgang Popp
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!ELEMENT PC (PDS | DH | SC | VK | Signature)+>
+<!ELEMENT PDS (PD)+>
+<!ELEMENT PD (S | CH | AS)+>
+<!ELEMENT S (#PCDATA)>
+<!ELEMENT CH (#PCDATA)>
+<!ELEMENT AS (#PCDATA)>
+<!ELEMENT DH (#PCDATA)>
+<!ELEMENT SC (#PCDATA)>
+<!ELEMENT VK (#PCDATA)>
+
+<!ELEMENT Signature (SignatureInfo | References | SignatureValue )+>
+<!ELEMENT SignatureInfo ( CanonicalizationMethod | RedactableSignatureAlgorithm )+>
+<!ELEMENT CanonicalizationMethod (#PCDATA)>
+<!ELEMENT RedactableSignatureAlgorithm (#PCDATA)>
+<!ELEMENT References (Reference)+>
+<!ELEMENT Reference (Pointer | Proof )+>
+<!ELEMENT Pointer (#PCDATA)>
+<!ELEMENT Proof (Data)+>
+<!ELEMENT Data (#PCDATA)>
+<!ELEMENT SignatureValue ( Tag | ProofOfTag | AccumulatorValue )+>
+<!ELEMENT Tag (#PCDATA)>
+<!ELEMENT ProofOfTag (#PCDATA)>
+<!ELEMENT AccumulatorValue (#PCDATA)>
+
+<!ATTLIST PC id ID #IMPLIED>
+<!ATTLIST PDS id ID #IMPLIED>
+<!ATTLIST Signature xmlns CDATA #IMPLIED>
+<!ATTLIST PD id ID #IMPLIED>
+<!ATTLIST DH id ID #IMPLIED>
+<!ATTLIST SC id ID #IMPLIED>
+<!ATTLIST VK id ID #IMPLIED>
+
+<!ATTLIST CanonicalizationMethod Algorithm CDATA #IMPLIED>
+<!ATTLIST RedactableSignatureAlgorithm Algorithm CDATA #IMPLIED>
+<!ATTLIST Pointer Redactable CDATA #IMPLIED>
+<!ATTLIST Pointer URI CDATA #IMPLIED>

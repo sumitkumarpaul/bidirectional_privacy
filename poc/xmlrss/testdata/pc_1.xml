@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE PC SYSTEM "xmlrss/testdata/pc.dtd">
+<PC id="pc">
+    <PDS id="pds">
+        <PD id="pd_1">
+            <S>OE5T4dEw2EvOgFIoaIEURe3LqWMj1heOJqDlrNxTXn6yhGpwk8nwl1Rzb4DlDr3RSerocSyDTfOeh3YLlV9EcfNX96vnWsWXKJBl51LJsMth3wPRcL0ZCO4wdOh05kAR5MDGrCJjkyNcGbES8F8UCWtHuhXuBcwv2eXTv5LHXQ5qkis58pmB7ac2E1USIuNOPPErFWpLMI7EOMCB6gASJFyoTUmVnfW6ENOLjFq0hFZih5tHbIeJb6FLWNa8pp5fVMCxRFKxVMetWsPxo5kFtWBcRsjRUBmUCDggWTUdYdFBoQqSMq3yLh54sG45TVLBbGNqFLrNmpXF0QpMc7klTG9uOIF24n1k9ONClJM3mqYh2Nh38Lya4Qs4AnUANQD00bVZJ9VTMppBQq7uHoqfnUPER3HFbYCWOcB28JJPAqQNuV1bZucalbzL2JlEBItyGLx2SapgJ9V2qdv0UCY0skiuLZ4ypQrRzyyIxkhdX1Mgbhuzshuy</S>
+            <CH>2f0060873d9c9c30ca4df80a9e9b5f8c172fb8fc14fba2bd6dee465ed8123b43</CH>
+            <AS>IAG3pv4ARIZuEnMSaO/9Rsals6tsN0Uoyia8F4pOW0cFjgjs1Bwiembo64nrvA8f6FyXomK0rPBkEfbYvOT7FxVq/Hal0eDauSdcRCAVB2tbKJcUfgm3tuENy588+7QxnN8RjMx928SyqWnArRisLAIgAd4hF0gOYuAgohUJ39qnBpZ0e0tHO3MhZUbEfjy7/iAbDfgs1Q8IszVYXhBK9KYV03ncRJj+GOHWn8tEz1jcDJ9z5MxPjXva3xmNNMtDKu55EtQczg5UOXfUxOboPc0oeZk2zyJYRlU2SQWTDqhfgKiJTMqb0qONp8VlJVulBMJpTouB1fcicfQgTrQQCQ==</AS>
+        </PD>
+    </PDS>
+    <DH id="dh"></DH>
+    <SC id="sc"></SC>
+    <VK id="vk"></VK>
+</PC>

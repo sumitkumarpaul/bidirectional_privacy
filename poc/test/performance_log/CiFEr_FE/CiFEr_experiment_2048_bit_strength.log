@@ -1,0 +1,54 @@
+[ 53%] Built target cifer
+[100%] Built target cifer_test
+Running test suite with seed 0x84488589...
+/innerprod/fullysec/damgard/end-to-end
+  parameters=1                       
+[27-03-2024 19:03:22.676433] One time-setup start
+
+[27-03-2024 19:03:22.689717] One time-setup end
+[27-03-2024 19:03:22.689724] Data-access start for 1 parameters
+
+[27-03-2024 19:03:22.891505] Data-access end
+[ OK    ] [ 0.21521820 / 0.21520820 CPU ]
+  parameters=20                      
+[27-03-2024 19:03:22.893526] One time-setup start
+
+[27-03-2024 19:03:23.063216] One time-setup end
+[27-03-2024 19:03:23.063236] Data-access start for 20 parameters
+
+[27-03-2024 19:03:24.109275] Data-access end
+[ OK    ] [ 1.21594891 / 1.21591400 CPU ]
+  parameters=40                      
+[27-03-2024 19:03:24.116097] One time-setup start
+
+[27-03-2024 19:03:24.434549] One time-setup end
+[27-03-2024 19:03:24.434570] Data-access start for 40 parameters
+
+[27-03-2024 19:03:25.888266] Data-access end
+[ OK    ] [ 1.77237408 / 1.77235020 CPU ]
+  parameters=60                      
+[27-03-2024 19:03:25.897125] One time-setup start
+
+[27-03-2024 19:03:26.372356] One time-setup end
+[27-03-2024 19:03:26.372375] Data-access start for 60 parameters
+
+[27-03-2024 19:03:28.193285] Data-access end
+[ OK    ] [ 2.29642007 / 2.29638820 CPU ]
+  parameters=80                      
+[27-03-2024 19:03:28.203981] One time-setup start
+
+[27-03-2024 19:03:28.845956] One time-setup end
+[27-03-2024 19:03:28.845973] Data-access start for 80 parameters
+
+[27-03-2024 19:03:30.937478] Data-access end
+[ OK    ] [ 2.73384950 / 2.73376960 CPU ]
+  parameters=100                     
+[27-03-2024 19:03:30.950020] One time-setup start
+
+[27-03-2024 19:03:31.738381] One time-setup end
+[27-03-2024 19:03:31.738398] Data-access start for 100 parameters
+
+[27-03-2024 19:03:34.021571] Data-access end
+[ OK    ] [ 3.14025955 / 3.14021550 CPU ]
+6 of 6 (100%) tests successful, 0 (0%) test skipped.
+[100%] Built target test

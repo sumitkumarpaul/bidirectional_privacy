@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "sgx_report.h": "c",
+        "sstream": "c"
+    }
+}

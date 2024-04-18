@@ -1,0 +1,80 @@
+============================================================================================================
+Measured average BPPM performance parameters of after running each combinations for: 100-times
+============================================================================================================
+
+------------------------------
+Overview of the Setup stage
+------------------------------
+For xmlrss/testdata/pc_20.xml, the amount of network transfer is:	 348790 bytes,	aveage time requirement is:	 181471 us
+For xmlrss/testdata/pc_40.xml, the amount of network transfer is:	 689389 bytes,	aveage time requirement is:	 218559 us
+For xmlrss/testdata/pc_60.xml, the amount of network transfer is:	 1029990 bytes,	aveage time requirement is:	 256836 us
+For xmlrss/testdata/pc_80.xml, the amount of network transfer is:	 1370589 bytes,	aveage time requirement is:	 294765 us
+For xmlrss/testdata/pc_100.xml, the amount of network transfer is:	 1711190 bytes,	aveage time requirement is:	 332607 us
+
+------------------------------
+Overview of the SendOrg stage
+------------------------------
+
+Vary #PD
+++++++++++
+For xmlrss/testdata/pc_20.xml, the amount of network transfer is:	 34303 bytes,	aveage time requirement is:	 300594 us
+For xmlrss/testdata/pc_40.xml, the amount of network transfer is:	 54345 bytes,	aveage time requirement is:	 292288 us
+For xmlrss/testdata/pc_60.xml, the amount of network transfer is:	 68111 bytes,	aveage time requirement is:	 287677 us
+For xmlrss/testdata/pc_80.xml, the amount of network transfer is:	 95221 bytes,	aveage time requirement is:	 296666 us
+For xmlrss/testdata/pc_100.xml, the amount of network transfer is:	 115527 bytes,	aveage time requirement is:	 295069 us
+
+Vary #DI
+++++++++++
+For xmlrss/testdata/ds_20.xml, the amount of network transfer is:	 14923 bytes,	aveage time requirement is:	 244496 us
+For xmlrss/testdata/ds_40.xml, the amount of network transfer is:	 8549 bytes,	aveage time requirement is:	 240673 us
+For xmlrss/testdata/ds_60.xml, the amount of network transfer is:	 16433 bytes,	aveage time requirement is:	 254292 us
+For xmlrss/testdata/ds_80.xml, the amount of network transfer is:	 17145 bytes,	aveage time requirement is:	 234344 us
+For xmlrss/testdata/ds_100.xml, the amount of network transfer is:	 17900 bytes,	aveage time requirement is:	 238406 us
+
+------------------------------
+Overview of the Process stage
+------------------------------
+
+Vary #DI 
++++++++++++
+For xmlrss/testdata/ds_20.xml, the amount of network transfer is:	 24 bytes,	aveage time requirement is:	 633 us
+For xmlrss/testdata/ds_40.xml, the amount of network transfer is:	 24 bytes,	aveage time requirement is:	 680 us
+For xmlrss/testdata/ds_60.xml, the amount of network transfer is:	 24 bytes,	aveage time requirement is:	 704 us
+For xmlrss/testdata/ds_80.xml, the amount of network transfer is:	 24 bytes,	aveage time requirement is:	 728 us
+For xmlrss/testdata/ds_100.xml, the amount of network transfer is:	 24 bytes,	aveage time requirement is:	 744 us
+
+---------------------------------
+Overview of the ForwardData stage
+---------------------------------
+
+Vary #PD but no redaction
++++++++++++++++++++++++++++
+For xmlrss/testdata/pc_20.xml[0%-redaction], the amount of network transfer is:	 34286 bytes,	aveage time requirement is:	 304089 us
+For xmlrss/testdata/pc_40.xml[0%-redaction], the amount of network transfer is:	 47567 bytes,	aveage time requirement is:	 312284 us
+For xmlrss/testdata/pc_60.xml[0%-redaction], the amount of network transfer is:	 68034 bytes,	aveage time requirement is:	 318145 us
+For xmlrss/testdata/pc_80.xml[0%-redaction], the amount of network transfer is:	 88251 bytes,	aveage time requirement is:	 316156 us
+For xmlrss/testdata/pc_100.xml[0%-redaction], the amount of network transfer is:	 108741 bytes,	aveage time requirement is:	 319693 us
+
+Vary #PD and 25% redaction
+++++++++++++++++++++++++++++++
+For xmlrss/testdata/pc_20.xml[25%-redaction], the amount of network transfer is:	 22239 bytes,	aveage time requirement is:	 264689 us
+For xmlrss/testdata/pc_40.xml[25%-redaction], the amount of network transfer is:	 37545 bytes,	aveage time requirement is:	 314264 us
+For xmlrss/testdata/pc_60.xml[25%-redaction], the amount of network transfer is:	 52761 bytes,	aveage time requirement is:	 315681 us
+For xmlrss/testdata/pc_80.xml[25%-redaction], the amount of network transfer is:	 68219 bytes,	aveage time requirement is:	 315639 us
+For xmlrss/testdata/pc_100.xml[25%-redaction], the amount of network transfer is:	 83436 bytes,	aveage time requirement is:	 318041 us
+
+Vary #PD and 50% redaction
+++++++++++++++++++++++++++++++
+For xmlrss/testdata/pc_20.xml[50%-redaction], the amount of network transfer is:	 17238 bytes,	aveage time requirement is:	 266317 us
+For xmlrss/testdata/pc_40.xml[50%-redaction], the amount of network transfer is:	 27535 bytes,	aveage time requirement is:	 315700 us
+For xmlrss/testdata/pc_60.xml[50%-redaction], the amount of network transfer is:	 37725 bytes,	aveage time requirement is:	 315196 us
+For xmlrss/testdata/pc_80.xml[50%-redaction], the amount of network transfer is:	 47932 bytes,	aveage time requirement is:	 317590 us
+For xmlrss/testdata/pc_100.xml[50%-redaction], the amount of network transfer is:	 58390 bytes,	aveage time requirement is:	 314202 us
+
+Vary #DI 
++++++++++++
+For xmlrss/testdata/ds_20.xml, the amount of network transfer is:	 8060 bytes,	aveage time requirement is:	 266554 us
+For xmlrss/testdata/ds_40.xml, the amount of network transfer is:	 8814 bytes,	aveage time requirement is:	 268562 us
+For xmlrss/testdata/ds_60.xml, the amount of network transfer is:	 9571 bytes,	aveage time requirement is:	 267542 us
+For xmlrss/testdata/ds_80.xml, the amount of network transfer is:	 10339 bytes,	aveage time requirement is:	 270106 us
+For xmlrss/testdata/ds_100.xml, the amount of network transfer is:	 11094 bytes,	aveage time requirement is:	 270158 us

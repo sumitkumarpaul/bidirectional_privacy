@@ -1,0 +1,501 @@
+Operation, Configuration, Iteration number, Time in us
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 1,  325438
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 2,  301021
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 3,  305786
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 4,  285321
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 5,  297708
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 6,  305535
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 7,  337131
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 8,  290257
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 9,  305094
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 10,  306265
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 11,  292769
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 12,  289791
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 13,  326197
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 14,  300404
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 15,  293420
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 16,  293019
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 17,  305298
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 18,  293605
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 19,  302294
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 20,  297429
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 21,  301015
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 22,  309625
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 23,  301489
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 24,  338098
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 25,  289196
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 26,  314229
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 27,  369158
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 28,  289300
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 29,  285644
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 30,  290083
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 31,  292931
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 32,  294053
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 33,  329370
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 34,  320658
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 35,  301779
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 36,  294859
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 37,  304971
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 38,  280937
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 39,  329446
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 40,  293966
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 41,  281689
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 42,  305773
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 43,  317363
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 44,  310058
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 45,  289740
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 46,  293138
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 47,  318414
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 48,  308969
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 49,  290542
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 50,  301161
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 51,  293070
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 52,  285826
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 53,  301773
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 54,  316929
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 55,  322449
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 56,  297256
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 57,  301136
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 58,  298102
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 59,  296828
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 60,  289805
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 61,  301466
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 62,  313173
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 63,  301893
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 64,  290256
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 65,  293013
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 66,  305974
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 67,  289555
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 68,  326149
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 69,  305790
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 70,  297438
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 71,  293594
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 72,  297646
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 73,  285148
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 74,  390224
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 75,  293646
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 76,  304958
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 77,  294118
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 78,  293476
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 79,  286013
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 80,  301219
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 81,  304745
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 82,  301782
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 83,  305644
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 84,  293779
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 85,  313745
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 86,  309306
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 87,  293759
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 88,  305348
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 89,  302140
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 90,  293797
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 91,  304946
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 92,  309280
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 93,  313130
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 94,  309839
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 95,  292820
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 96,  302341
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 97,  312749
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 98,  298111
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 99,  313096
+Forward(vary #DI), xmlrss/testdata/ds_1.xml, 100,  310240
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 1,  301047
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 2,  301700
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 3,  301804
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 4,  305775
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 5,  297786
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 6,  325482
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 7,  322123
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 8,  293959
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 9,  297487
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 10,  304886
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 11,  330491
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 12,  304845
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 13,  301073
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 14,  278563
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 15,  297078
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 16,  305147
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 17,  290419
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 18,  308998
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 19,  305573
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 20,  298012
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 21,  293640
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 22,  292790
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 23,  305775
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 24,  314357
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 25,  316867
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 26,  293467
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 27,  290217
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 28,  293405
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 29,  297330
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 30,  289850
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 31,  308871
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 32,  314116
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 33,  285749
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 34,  292685
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 35,  297683
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 36,  298041
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 37,  292815
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 38,  286259
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 39,  317776
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 40,  328196
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 41,  306463
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 42,  292781
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 43,  285334
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 44,  289518
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 45,  305151
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 46,  296772
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 47,  301884
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 48,  297879
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 49,  304976
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 50,  300960
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 51,  309761
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 52,  314361
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 53,  301211
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 54,  309451
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 55,  317934
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 56,  316885
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 57,  293569
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 58,  313210
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 59,  313150
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 60,  286389
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 61,  305172
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 62,  288821
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 63,  305868
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 64,  298160
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 65,  292855
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 66,  297556
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 67,  293717
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 68,  320385
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 69,  306238
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 70,  297870
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 71,  297429
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 72,  316902
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 73,  297806
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 74,  305364
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 75,  301183
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 76,  305737
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 77,  321075
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 78,  293413
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 79,  301572
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 80,  302005
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 81,  293355
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 82,  294420
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 83,  284480
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 84,  293595
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 85,  301690
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 86,  305507
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 87,  285708
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 88,  297348
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 89,  310222
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 90,  293163
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 91,  297913
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 92,  292973
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 93,  322059
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 94,  293829
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 95,  297269
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 96,  313171
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 97,  314152
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 98,  297456
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 99,  289067
+Forward(vary #DI), xmlrss/testdata/ds_10.xml, 100,  297919
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 1,  312900
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 2,  298312
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 3,  304811
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 4,  293353
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 5,  302432
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 6,  313184
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 7,  301948
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 8,  333378
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 9,  317566
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 10,  297343
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 11,  293337
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 12,  305101
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 13,  314108
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 14,  293589
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 15,  305020
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 16,  301103
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 17,  300759
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 18,  290316
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 19,  297340
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 20,  297698
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 21,  297541
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 22,  293016
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 23,  289516
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 24,  333208
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 25,  294433
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 26,  300425
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 27,  310132
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 28,  297072
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 29,  305313
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 30,  301009
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 31,  301586
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 32,  305716
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 33,  297480
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 34,  297479
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 35,  297774
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 36,  297068
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 37,  325574
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 38,  301701
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 39,  289790
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 40,  305743
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 41,  317065
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 42,  301556
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 43,  288484
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 44,  294422
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 45,  308824
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 46,  302319
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 47,  313988
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 48,  293168
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 49,  325066
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 50,  301469
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 51,  301527
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 52,  312827
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 53,  298564
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 54,  305614
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 55,  309013
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 56,  309142
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 57,  302023
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 58,  322036
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 59,  313350
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 60,  297000
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 61,  300749
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 62,  301549
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 63,  294644
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 64,  300652
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 65,  314211
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 66,  301325
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 67,  297985
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 68,  292786
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 69,  297599
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 70,  314268
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 71,  301519
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 72,  297529
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 73,  305223
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 74,  296958
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 75,  301191
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 76,  290777
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 77,  305044
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 78,  293547
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 79,  297989
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 80,  293446
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 81,  301435
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 82,  317452
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 83,  321039
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 84,  294390
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 85,  297995
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 86,  305648
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 87,  325314
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 88,  300403
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 89,  314296
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 90,  300445
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 91,  302531
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 92,  312498
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 93,  322671
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 94,  288487
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 95,  305627
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 96,  298105
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 97,  285070
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 98,  297319
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 99,  293708
+Forward(vary #DI), xmlrss/testdata/ds_100.xml, 100,  325329
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 1,  369318
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 2,  357393
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 3,  356916
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 4,  389183
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 5,  365565
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 6,  369212
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 7,  337296
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 8,  353113
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 9,  342095
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 10,  349392
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 11,  341105
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 12,  358127
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 13,  356590
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 14,  373894
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 15,  353448
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 16,  353679
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 17,  357299
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 18,  353802
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 19,  357546
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 20,  342272
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 21,  360942
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 22,  364964
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 23,  357715
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 24,  349966
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 25,  361576
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 26,  373446
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 27,  344592
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 28,  350300
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 29,  353492
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 30,  359959
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 31,  334032
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 32,  353412
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 33,  345301
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 34,  341316
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 35,  338364
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 36,  377216
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 37,  380818
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 38,  341293
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 39,  344790
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 40,  345428
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 41,  349483
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 42,  365263
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 43,  349871
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 44,  353053
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 45,  333607
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 46,  381773
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 47,  357591
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 48,  341231
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 49,  358022
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 50,  341264
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 51,  357120
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 52,  353679
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 53,  356748
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 54,  342224
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 55,  356511
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 56,  358344
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 57,  372750
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 58,  370115
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 59,  344382
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 60,  358813
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 61,  352280
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 62,  345813
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 63,  361040
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 64,  345712
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 65,  365117
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 66,  360797
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 67,  366352
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 68,  348678
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 69,  378216
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 70,  349128
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 71,  361996
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 72,  344730
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 73,  381619
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 74,  377333
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 75,  334175
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 76,  361393
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 77,  369544
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 78,  380933
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 79,  354113
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 80,  352632
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 81,  350031
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 82,  361185
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 83,  361938
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 84,  356908
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 85,  346173
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 86,  350583
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 87,  352638
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 88,  357418
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 89,  333544
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 90,  353483
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 91,  369206
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 92,  365911
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 93,  349158
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 94,  368942
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 95,  341546
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 96,  341713
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 97,  349464
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 98,  345729
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 99,  345055
+Forward(vary #DI), xmlrss/testdata/ds_1000.xml, 100,  350540
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 1, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 2,  441423
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 3, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 4, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 5,  416489
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 6, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 7,  413116
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 8,  421274
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 9,  397352
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 10, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 11,  429609
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 12, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 13, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 14, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 15,  464997
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 16, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 17,  409648
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 18, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 19, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 20,  413546
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 21,  416534
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 22,  425562
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 23, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 24,  425489
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 25, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 26, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 27, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 28, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 29, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 30, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 31, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 32, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 33, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 34,  402241
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 35, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 36, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 37, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 38, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 39, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 40, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 41, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 42,  429735
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 43, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 44, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 45, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 46, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 47, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 48,  421507
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 49, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 50, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 51,  422065
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 52, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 53, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 54,  428738
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 55,  430126
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 56, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 57, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 58, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 59, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 60, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 61, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 62, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 63,  417019
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 64, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 65, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 66, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 67, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 68, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 69, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 70,  825530
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 71, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 72, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 73,  449091
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 74, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 75, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 76, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 77, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 78, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 79, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 80, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 81,  437264
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 82, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 83, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 84, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 85,  412996
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 86,  426123
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 87,  413249
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 88,  404984
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 89, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 90, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 91, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 92, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 93, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 94, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 95, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 96,  424923
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 97, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 98, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 99, 
+Forward(vary #DI), xmlrss/testdata/ds_10000.xml, 100,  409190

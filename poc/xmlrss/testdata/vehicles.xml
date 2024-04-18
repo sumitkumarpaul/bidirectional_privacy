@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE Vehicle SYSTEM "testdata/vehicles.dtd">
+<Vehicle>
+    <Aircraft id="a1">
+        <Glider id="g1">DG-800</Glider>
+        <Jet id="j1">Airbus A380</Jet>
+    </Aircraft>
+    <Watercraft id="a2">
+        <Sailboat>Bavaria 36</Sailboat>
+        <Motorboat>Bavaria Sport 29</Motorboat>
+    </Watercraft>
+    <MotorVehicles id="a3">
+        <Car Model="A3" Brand="Audi"/>
+        <Car Brand="Audi" Model="A4"/>
+        <Car Brand="BMW" Model="i7"/>
+        <Motorcycle Brand="Honda" Model="RC212V"/>
+    </MotorVehicles>
+</Vehicle>

@@ -1,0 +1,11 @@
+============================================================================================================
+Measured average BPPM performance parameters of after running each combinations for: 10-times
+============================================================================================================
+
+Vary #DI
+++++++++++
+For xmlrss/testdata/ds_20.xml, the amount of network transfer is:	 7973 bytes,	aveage time requirement is:	 253323 us
+For xmlrss/testdata/ds_40.xml, the amount of network transfer is:	 8731 bytes,	aveage time requirement is:	 217873 us
+For xmlrss/testdata/ds_60.xml, the amount of network transfer is:	 16433 bytes,	aveage time requirement is:	 280622 us
+For xmlrss/testdata/ds_80.xml, the amount of network transfer is:	 17206 bytes,	aveage time requirement is:	 217026 us
+For xmlrss/testdata/ds_100.xml, the amount of network transfer is:	 17960 bytes,	aveage time requirement is:	 248111 us
