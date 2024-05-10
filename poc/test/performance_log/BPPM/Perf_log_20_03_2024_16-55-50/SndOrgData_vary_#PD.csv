@@ -1,6 +1,0 @@
-Operation, Configuration, Iteration number, Time in us
-SendOrgData, xmlrss/testdata/pc_20.xml, 1,  257416
-SendOrgData, xmlrss/testdata/pc_40.xml, 1,  195728
-SendOrgData, xmlrss/testdata/pc_60.xml, 1,  364855
-SendOrgData, xmlrss/testdata/pc_80.xml, 1,  345506
-SendOrgData, xmlrss/testdata/pc_100.xml, 1,  177821

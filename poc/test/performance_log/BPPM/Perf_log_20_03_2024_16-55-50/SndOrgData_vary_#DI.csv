@@ -1,6 +1,0 @@
-Operation, Configuration, Iteration number, Time in us
-SendOrgData, xmlrss/testdata/ds_1.xml, 1,  265800
-SendOrgData, xmlrss/testdata/ds_10.xml, 1,  374629
-SendOrgData, xmlrss/testdata/ds_100.xml, 1,  202268
-SendOrgData, xmlrss/testdata/ds_1000.xml, 1,  232022
-SendOrgData, xmlrss/testdata/ds_10000.xml, 1,  323661

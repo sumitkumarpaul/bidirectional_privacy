@@ -1,6 +1,0 @@
-cd ./u_data_user/; ./u_data_user "1235" "../test_data_creater/certs/server-cert.pem" "../test_data_creater/certs/server-key.pem"&disown;cd ../u_data_owner;sleep 2;./u_data_owner 127.0.0.1 1235 ../test_data_creater/data_cert/sample_do_data_1000_attr.pem 2308185037;cd ../
-[1] 16510
-[09-10-2023 19:46:56.503369] Data-owner: Starting data-provision stage
-[09-10-2023 19:46:56.555198] Data-owner: Successfully completed data-provision stage
-sumit@SGXDC4sv3:~/phd-uottawa-research/Research/Data_rotting/ICC_24/Implementation/data-rotting/test$ [09-10-2023 19:46:56.561009] Data-user: Before accessing the data
-[09-10-2023 19:46:56.561562] Data-user: After accessing the data
