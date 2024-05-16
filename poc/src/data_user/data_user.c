@@ -36,7 +36,7 @@
 
 #include <sgx_report.h>
 #include "ra_tls.h"
-#include "../enclave_details.h"
+#include <enclave_details.h>
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 

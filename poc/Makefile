@@ -58,22 +58,22 @@ CFLAGS += $(shell pkg-config --cflags mbedtls_gramine) \
           $(shell pkg-config --cflags ra_tls_gramine)
 
 #### Sumit added
-CFLAGS += -I/usr/include/libxml2/
+CFLAGS += -I/usr/include/libxml2/ -I./src/include/
 CFLAGS += -lxml2
 
 # no need for `pkg-config --libs ra_tls_gramine` because programs use dlopen
 LDFLAGS += -ldl -Wl,--enable-new-dtags $(shell pkg-config --libs mbedtls_gramine)
 
-enclave: src/enclave/enclave.c
+enclave: src/enclave/enclave.c src/include/enclave_details.h
 	$(CC) $< $(CFLAGS) $(LDFLAGS) -o $@
 
-data_user: src/data_user/data_user.c src/enclave_details.h
+data_user: src/data_user/data_user.c src/include/enclave_details.h
 	$(CC) $< $(CFLAGS) $(LDFLAGS) -o $@
 
-data_owner: src/data_owner/data_owner.c src/enclave_details.h
+data_owner: src/data_owner/data_owner.c src/include/enclave_details.h
 	$(CC) $< $(CFLAGS) $(LDFLAGS) -o $@
 
-code_provider: src/code_provider/code_provider.c src/enclave_details.h
+code_provider: src/code_provider/code_provider.c src/include/enclave_details.h
 	$(CC) $< $(CFLAGS) $(LDFLAGS) -o $@
 
 ############################### SERVER MANIFEST ###############################
