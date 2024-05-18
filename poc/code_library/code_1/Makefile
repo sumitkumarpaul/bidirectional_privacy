@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -fPIC -Wall -Wextra
+CFLAGS = -fPIC -Wall -Wextra -I/usr/include/libxml2/
 
 TARGET = $(shell basename $(CURDIR)).so
 SOURCES = $(wildcard *.c)

@@ -47,14 +47,15 @@
 #define ENCLAVE_LOG_LVL_ALL 4
 
 unsigned int SAVED_LOG_LVL;
-unsigned int ENCLAVE_LOG_LVL = ENCLAVE_LOG_LVL_PERF_RSLT;
+unsigned int ENCLAVE_LOG_LVL = ENC_DEF_LOG_LVL;
 
 #define DEBUG_LEVEL 0
 
 #define CA_CRT_PATH "ssl/ca.crt"
 #define SRV_CRT_PATH "ssl/enclave.crt"
 #define SRV_KEY_PATH "ssl/enclave.key"
-#define BUF1_SZ 16384
+
+#define BUF1_SZ 20480
 #define BUF2_SZ 10240
 #define FILE_BUF_SZ 102400
 #define PRINT_BUF_SZ 1024
@@ -105,6 +106,7 @@ static mbedtls_ctr_drbg_context ssl_client_ctr_drbg;
 static mbedtls_ssl_context ssl_client_ssl;
 static mbedtls_ssl_config ssl_client_conf;
 static mbedtls_x509_crt ssl_client_cacert;
+static unsigned int eid;//enclave id
 struct timeval start_tv;
 struct timeval end_tv;
 unsigned int total_tim;
@@ -183,6 +185,9 @@ int main(int argc, char **argv)
     size_t sk_sz;
     size_t clen;
     size_t plen;
+
+    /* Use the pid to identify the enclave */
+    eid = getpid();
 
     if (argc < 2)
     {
@@ -447,9 +452,8 @@ static void execute_commands()
 
             if (ret != -1)
             {
-                /* For testing, use these parameters. Depending on the situation the content and number of data elements in xml file will change */
+                enclave_print_log(ENCLAVE_LOG_LVL_MIN, 1, "Forwarding data (did: %d) after removing: %d data processing statements\n", did, rem_list_sz);
                 ret = execute_PrepFrd(remote_DU_IP, remote_enc_port, did, rem_list, rem_list_sz);
-                enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Returned result is: %u after executing the function on the saved data\n", result); // Sumit may happen buffer overflow
             }
 
             if (ret == 0)
@@ -530,9 +534,11 @@ static void execute_commands()
             if (ret != -1)
             {
                 enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Starting execution: did = %d, S_ID = %d\n", did, S_ID);
+                
                 /* For testing, use these parameters. Depending on the situation the content and number of data elements in xml file will change */
                 ret = execute_Process(did, S_ID, &result);
-                enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Returned result is: %u after executing the function on the saved data\n", result); // Sumit may happen buffer overflow
+
+                enclave_print_log(ENCLAVE_LOG_LVL_MIN, 1, "Processed data (did: %d) according to processing statement ID: %d, the result is: %u\n", did, S_ID, result);
             }
 
             if (ret == 0)
@@ -1125,7 +1131,8 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
     {
         num_pd = xmlChildElementCount(node);
         pd_node = xmlFirstElementChild(node);
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Number of pd in pds: %d\n", num_pd);
+
+        enclave_print_log(ENCLAVE_LOG_LVL_MIN, 1, "Started executing setup with: %d proposed data-processing statements\n", num_pd);
 
         for (i = 0; i < num_pd; i++)
         {
@@ -1135,9 +1142,9 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
 
             /* Prepare the command for obtaining a particular code */
             /* Note: Do not put any <space> in the command */
-            req_sz = sprintf(buf1, "GetCode,%d,%s,%s", 0, CP_IP, port);
+            req_sz = sprintf(buf1, "GetCode,%d,%s,%s", i, CP_IP, port);
 
-            enclave_print_log(ENCLAVE_LOG_LVL_MIN, 1, "Warning: For experimental purpose, always request for code 0\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Warning: For experimental purpose, always request for code 0\n");
 
             /* Send request for a particular code over the TCP connection */
             ret = mbedtls_net_send(&cp_client_fd, buf1, req_sz);
@@ -1220,6 +1227,8 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
             pd_node = xmlNextElementSibling(pd_node);
             enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, " Ended processing file %s\n", saved_location_name);
         }
+
+        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, " Received %d code components from the CP\n", num_rcvd_code);
     }
     else
     {
@@ -1355,13 +1364,13 @@ static int execute_SaveData(unsigned int *pdid)
 {
     int ret = -1;
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Within the function: %s\n", __func__);
-
     if (ENC_STATE != 2)
     {
         enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot execute: %s, current state of enclave is: %d\n", __func__, ENC_STATE);
         goto exit;
     }
+
+    enclave_print_log(ENCLAVE_LOG_LVL_MIN, 1, "Waiting for receiving the data and consent\n");
 
     ret = ssl_server_con_accept();
 
@@ -1565,7 +1574,7 @@ static void enclave_print_log(int enclave_dbg_lvl, int do_flush, const char *fmt
 
         if (now != NULL)
         {
-            printed_size = snprintf(print_buf, PRINT_BUF_SZ, "[ENC.] [%02d-%02d-%04d %02d:%02d:%02d.%06ld] ", now->tm_mday, (now->tm_mon + 1), (now->tm_year + 1900), now->tm_hour, now->tm_min, now->tm_sec, tv.tv_usec);
+            printed_size = snprintf(print_buf, PRINT_BUF_SZ, "[ENC: %07d]\t[%02d-%02d-%04d %02d:%02d:%02d.%06ld] ", eid, now->tm_mday, (now->tm_mon + 1), (now->tm_year + 1900), now->tm_hour, now->tm_min, now->tm_sec, tv.tv_usec);
         }
 
         va_start(ap, fmt);
@@ -1678,7 +1687,7 @@ static int ssl_client_connect(const char* IP, const char* port)
     }
     else
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "[ using normal TLS flows ]\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "[ Non-sgx mode, instead of RA-TLS, using normal TLS flows ]\n");
     }
 
     enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "\n  . Seeding the random number generator...");
@@ -2701,8 +2710,6 @@ static int VerifyAndSave()
     unsigned int i;
     FILE *fp;
     size_t fresh_sk_len, fresh_pk_len, DO_pk_len, sig_len, buf_sz;
-
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Within the function: %s\n", __func__);
 
     ret = sha256_file(received_D_file, NULL, sha256_buf, 0);
 
@@ -3773,11 +3780,11 @@ static void aes_decrypt_file(const char *input_filename, const char *output_file
     fseek(f, 0, SEEK_END); // seek to end of file
     file_sz = ftell(f);    // get current file pointer
     fseek(f, 0, SEEK_SET); // seek back to beginning of file    
-    enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Encrypted file(%s) size: %d\n", input_filename, file_sz);
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Encrypted file(%s) size: %d\n", input_filename, file_sz);
     fseek(fout, 0, SEEK_END); // seek to end of file
     file_sz = ftell(fout);    // get current file pointer
     fseek(fout, 0, SEEK_SET); // seek back to beginning of file
-    enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Decrypted file(%s) size: %d\n", output_filename, file_sz);
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Decrypted file(%s) size: %d\n", output_filename, file_sz);
 
 
     // Clean up

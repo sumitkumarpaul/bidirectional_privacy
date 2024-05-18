@@ -48,9 +48,12 @@ do
     #openssl x509 -inform pem -noout -text -in $data_cert
     # cp $data_conf $base_conf_file
 
+    #For experiment purpose only send ten different kinds of code
+    let "code_id = ($i - 1) % 10"
+
     # Fill-up the code-hash section    
     # Extract the code hash of the same code
-    code_sha256=$(sha256sum ../../code_library/code_0/code_0.so)
+    code_sha256=$(sha256sum ../../code_library/code_$code_id/code_$code_id.so)
     code_sha256="${code_sha256:0:64}"
     echo -e "            <CH>$code_sha256</CH>" >> $output_filename
 

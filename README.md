@@ -10,6 +10,10 @@ For simplicity, this document assumes all the involved parties (i.e., $DO$, $CP$
 
 Following steps are verified in Microsoft Azure cloud, SGX-enabled, DC4SV3 instance with an Ubuntu-20.04 Operating System.
 
+
+Run the script `./setup.sh` in the terminal to make the system ready.
+
+
 ### Install *Gramine* in your system
 
 At first install *Gramine* in your system. For that, in an terminal, issue the following commands in the specified order:
@@ -90,23 +94,14 @@ make
 ```
 In case of successful compilation, something like the following should be shown in the terminal:
 ```
-cc src/data_owner/data_owner.c -O2 -fPIE -I/usr/include/gramine -I/usr/include/gramine -I/usr/include/libxml2/ -I./src/include/ -lxml2 -pie -ldl -Wl,--enable-new-dtags -Wl,-rpath,/usr/lib/x86_64-linux-gnu -Wl,--start-group -lmbedcrypto_gramine -lmbedtls_gramine -lmbedx509_gramine -Wl,--end-group -o data_owner
-gramine-manifest \
-        -Dlog_level=error \
-        -Darch_libdir=/lib/x86_64-linux-gnu \
-        -Dra_type=dcap \
-        -Dra_client_spid= \
-        -Dra_client_linkable=0 \
-        enclave.manifest.template > enclave.manifest
 :
 :
-    000000003edfe000-000000003ee4e000 [REG:R-X] (code) measured
-    000000003ee4e000-000000003ee58000 [REG:RW-] (data) measured
+measured
     0000000000010000-000000003edfe000 [REG:RWX] (free)
 Measurement:
     9861d25aea36d2112c7db40befbc572a6f1a377b706e78862fcfb4019eb08031
-cc src/data_user/data_user.c -O2 -fPIE -I/usr/include/gramine -I/usr/include/gramine -I/usr/include/libxml2/ -I./src/include/ -lxml2 -pie -ldl -Wl,--enable-new-dtags -Wl,-rpath,/usr/lib/x86_64-linux-gnu -Wl,--start-group -lmbedcrypto_gramine -lmbedtls_gramine -lmbedx509_gramine -Wl,--end-group -o data_user
-cc src/code_provider/code_provider.c -O2 -fPIE -I/usr/include/gramine -I/usr/include/gramine -I/usr/include/libxml2/ -I./src/include/ -lxml2 -pie -ldl -Wl,--enable-new-dtags -Wl,-rpath,/usr/lib/x86_64-linux-gnu -Wl,--start-group -lmbedcrypto_gramine -lmbedtls_gramine -lmbedx509_gramine -Wl,--end-group -o code_provider
+cc src/data_user/data_user.c -O0 -ggdb3 -D ENC_DEF_LOG_LVL=ENCLAVE_LOG_LVL_MIN -D DU_DEF_LOG_LVL=DU_LOG_LVL_MIN -D DO_DEF_LOG_LVL=DO_LOG_LVL_MIN -D CP_DEF_LOG_LVL=CP_LOG_LVL_MIN -fPIE -I/usr/include/gramine -I/usr/include/gramine -I/usr/include/libxml2/ -I./src/include/ -lxml2 -pie -ldl -Wl,--enable-new-dtags -Wl,-rpath,/usr/lib/x86_64-linux-gnu -Wl,--start-group -lmbedcrypto_gramine -lmbedtls_gramine -lmbedx509_gramine -Wl,--end-group -o data_user
+cc src/code_provider/code_provider.c -O0 -ggdb3 -D ENC_DEF_LOG_LVL=ENCLAVE_LOG_LVL_MIN -D DU_DEF_LOG_LVL=DU_LOG_LVL_MIN -D DO_DEF_LOG_LVL=DO_LOG_LVL_MIN -D CP_DEF_LOG_LVL=CP_LOG_LVL_MIN -fPIE -I/usr/include/gramine -I/usr/include/gramine -I/usr/include/libxml2/ -I./src/include/ -lxml2 -pie -ldl -Wl,--enable-new-dtags -Wl,-rpath,/usr/lib/x86_64-linux-gnu -Wl,--start-group -lmbedcrypto_gramine -lmbedtls_gramine -lmbedx509_gramine -Wl,--end-group -o code_provider
 ```
 Now note down the details of the newly generated enclave in the current directory, by issuing the following command:
 
