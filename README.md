@@ -115,7 +115,7 @@ make
 
 ### 4.2 Run a sample walkthough of $BPPM$
 $BPPM$ can be used with different workflows and with different layouts of the data usage tree. The following diagram shows a sample walkthorugh. Supposes, there are only two data users $DU_{1,1}$ and $DU_{2,1}$, residing in two different layers. $DO$ provides some personal data to $DU_{1,1}$. $DU_{1,1}$ can perform some computation on that locally or can forward that to the next layer-data user,$DU_{2,1}$. \
-![Alt text](diagrams/Walkthrough.png?raw=true "Sample walkthorugh of BPPM")
+![Alt text](https://github.com/sumitkumarpaul/bidirectional_privacy/blob/main/diagrams/Walkthrough.png?raw=true "Sample walkthorugh of BPPM")
 At first, $DU_{1,1}$ and $DU_{2,1}$ setup their *enclave*. During this time, the $CP$ sends the required code components to those *enclave*s in piracy-protected way. Then $DO$, sends her personal data to $DU_{1,1}$. $DU_{1,1}$ performs some data processing and then forwards the data to $DU_{2,1}$ with reduced consent. Finally, $DU_{2,1}$ performs some data processing in its location.\
 \
 To facilitate the above mentioned walkthrough, a script is already prepared (`sample_protocol_walkthrough.sh`), which executes different parties in the proper order. Before running the script, couple of environmental variables must be exported in the terminal, by issuing the following commands:
