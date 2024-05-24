@@ -140,7 +140,7 @@ Setup_perf() {
       sleep 2
     done
     avg_val=$((total_val / num_itr))
-    echo -e "For ${pds_file[$i]}, the amount of network transfer is:\t $num_bytes bytes,\taveage time requirement is:\t $avg_val us" >> $report_file
+    echo -e "For ${pds_file[$i]}, the amount of network transfer is:\t $num_bytes bytes,\taverage time requirement is:\t $avg_val us" >> $report_file
   done
 
   # Close the CP
@@ -242,7 +242,7 @@ SndOrgData_perf() {
       rm "./do_perf.log"
     done
     avg_val=$((total_val / num_itr))
-    echo -e "For ${pds_file[$i]}, the amount of network transfer is:\t $num_bytes bytes,\taveage time requirement is:\t $avg_val us" >> $report_file
+    echo -e "For ${pds_file[$i]}, the amount of network transfer is:\t $num_bytes bytes,\taverage time requirement is:\t $avg_val us" >> $report_file
   done
 
   raw_log_filename="$log_folder/SndOrgData_vary_#DI.csv"
@@ -293,7 +293,7 @@ SndOrgData_perf() {
       rm "./do_perf.log"
     done
     avg_val=$((total_val / num_itr))
-    echo -e "For ${d_file[$i]}, the amount of network transfer is:\t $num_bytes bytes,\taveage time requirement is:\t $avg_val us" >> $report_file
+    echo -e "For ${d_file[$i]}, the amount of network transfer is:\t $num_bytes bytes,\taverage time requirement is:\t $avg_val us" >> $report_file
   done
 
   # Finalize the enclave and close the connection
@@ -467,7 +467,7 @@ ForwardData_perf() {
       sleep 1
     done
     avg_val=$((total_val / num_itr))
-    echo -e "For ${pds_file[$i]}[0%-redaction], the amount of network transfer is:\t $num_bytes bytes,\taveage time requirement is:\t $avg_val us" >> $report_file
+    echo -e "For ${pds_file[$i]}[0%-redaction], the amount of network transfer is:\t $num_bytes bytes,\taverage time requirement is:\t $avg_val us" >> $report_file
   done
 
   # Keep #DI fixed, but vary #PD, 25%-redaction
@@ -519,7 +519,7 @@ ForwardData_perf() {
       sleep 1
     done
     avg_val=$((total_val / num_itr))
-    echo -e "For ${pds_file[$i]}[25%-redaction], the amount of network transfer is:\t $num_bytes bytes,\taveage time requirement is:\t $avg_val us" >> $report_file
+    echo -e "For ${pds_file[$i]}[25%-redaction], the amount of network transfer is:\t $num_bytes bytes,\taverage time requirement is:\t $avg_val us" >> $report_file
   done
 
   # Keep #DI fixed, but vary #PD, 50%-redaction
@@ -572,7 +572,7 @@ ForwardData_perf() {
       sleep 1
     done
     avg_val=$((total_val / num_itr))
-    echo -e "For ${pds_file[$i]}[50%-redaction], the amount of network transfer is:\t $num_bytes bytes,\taveage time requirement is:\t $avg_val us" >> $report_file
+    echo -e "For ${pds_file[$i]}[50%-redaction], the amount of network transfer is:\t $num_bytes bytes,\taverage time requirement is:\t $avg_val us" >> $report_file
   done
 
   # Vary #DI, but keep #PD fixed
@@ -622,7 +622,7 @@ ForwardData_perf() {
       sleep 1
     done
     avg_val=$((total_val / num_itr))
-    echo -e "For ${d_file[$array_el]}, the amount of network transfer is:\t $num_bytes bytes,\taveage time requirement is:\t $avg_val us" >> $report_file
+    echo -e "For ${d_file[$array_el]}, the amount of network transfer is:\t $num_bytes bytes,\taverage time requirement is:\t $avg_val us" >> $report_file
   done
 
   # Finalize the receiving enclave and close the connection
@@ -752,7 +752,7 @@ ProcessData_perf() {
       sleep 1
     done
     avg_val=$((total_val / num_itr))
-    echo -e "For ${d_file[$i]}, the amount of network transfer is:\t $num_bytes bytes,\taveage time requirement is:\t $avg_val us" >> $report_file
+    echo -e "For ${d_file[$i]}, the amount of network transfer is:\t $num_bytes bytes,\taverage time requirement is:\t $avg_val us" >> $report_file
   done
 
   # Finalize the DU's enclave and close the connection
@@ -774,12 +774,19 @@ else
     num_itr=$1
     non_priv=$2
 fi
+
+# Install tcpdump, which will be required for measuring the network transfer
+sudo apt-get install -y tcpdump
+
 non_priv="${non_priv,,}"
 log_timestamp="$(date +"%d_%m_%Y_%H-%M-%S")"
 log_folder="Perf_log_$log_timestamp/"
 mkdir $log_folder
 report_file="$log_folder/Overall_report.txt"
 
+echo -e "============================================================================================================"
+echo -e "Started performance measurement of BPPM"
+echo -e "Please wait, it will take considerable amount of time..."
 echo -e "============================================================================================================" >> $report_file
 echo -e "Measured average BPPM performance parameters of after running each combinations for: $num_itr-times" >> $report_file
 
@@ -789,9 +796,13 @@ fi
 
 echo -e "============================================================================================================" >> $report_file
 
-#Setup_perf
+Setup_perf
 SndOrgData_perf
-#ProcessData_perf
-#ForwardData_perf
+ProcessData_perf
+ForwardData_perf
+
+echo -e "\nPerformance measurement completed..!! Open the folder $log_folder for detailed reports."
+echo -e "============================================================================================================"
+
 
 exit
