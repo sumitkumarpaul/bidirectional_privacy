@@ -1,46 +1,32 @@
 # Bidirectional Privacy
 This repository contains the prototype implementation of the $BPPM$-framework, which provides *Bidirectional Privacy-Preservation with Multi-Layer Data Sharing*.
 
-It is mainly implemented in ***C***-programming language. Intel-SGX is used as the underlying Trusted Execution Environment technology (TEE). Specifically, we use a Microsoft Azure cloud, SGX-enabled, [DC4SV3](https://learn.microsoft.com/en-us/azure/virtual-machines/dcv3-series) instance with an **Ubuntu-20.04** Operating System for performing all our development and experimentation. This implementation is dependent on [Gramine](https://github.com/gramineproject/gramine) shim-library for Intel-SGX related operation and on [MBed-TLS](https://github.com/Mbed-TLS/mbedtls/) library for the cryptographic primitives and network operations.
+The involved parties in $BPPM$ are, a data-owner ($DO$), a code-provider ($CP$) and a few data-users distributed among multiple layers. $DU_{i,j}$ denotes the $j^{th}$-data-user of $i^{th}$-layer. $\forall i,j:DU_{i,j}$ requires an environment having support of the, Trusted Execution Environment (TEE) and others do not require TEE.
 
-The involved parties in $BPPM$ are, a data-owner ($DO$), a code-provider ($CP$) and a few data-users distributed among multiple layers. $DU_{i,j}$ denotes the $j^{th}$-data-user of $i^{th}$-layer. $\forall i,j:DU_{i,j}$ requires TEE-enabled platform and others do not require TEE.
+$BPPM$ is mainly implemented in ***C***-programming language. This implementation is dependent on [Gramine](https://github.com/gramineproject/gramine) shim-library for TEE related operations and on [MBed-TLS](https://github.com/Mbed-TLS/mbedtls/) library for the cryptographic primitives and network operations. **Intel-SGX** is used as the underlying TEE. Specifically, for performing all our development, experimentation and performance measurement purpose, we use an SGX-enabled instance, [DC4SV3](https://learn.microsoft.com/en-us/azure/virtual-machines/dcv3-series) in Microsoft Azure cloud. We use **Ubuntu-20.04** Operating System, in that environment.
 
-## How to prepare the system?
-For simplicity, this document assumes all the involved parties (i.e., $DO$, $CP$ and $\forall i,j:DU_{i,j}$) will run on the same physical machine and communicate among themselves using local loopback interface. However, internet reachability of is required for the environment, otherwise attestation procedure may fail.
+## 1. How to create the system?
+Intel-SGX enabled VM can be created in Microsoft-Azure, by following [this guide line](https://learn.microsoft.com/en-us/azure/confidential-computing/quick-create-portal). After creating the system, enable the remote attestation by following [this link](https://learn.microsoft.com/en-us/azure/attestation/quickstart-powershell). This [text](https://learn.microsoft.com/en-us/azure/security/fundamentals/trusted-hardware-identity-management) might also be useful.
 
-Following steps are verified in Microsoft Azure cloud, SGX-enabled, DC4SV3 instance with an Ubuntu-20.04 Operating System.
+If you already have a SGX-enabled system, then this step is not required.
 
+## 2. How to prepare the system?
+A simple working environment can be created by running all the involved parties (i.e., $DO$, $CP$ and $\forall i,j:DU_{i,j}$) on the same enviroment and enable communication among themselves using local loopback interface. However, internet reachability of is required for the environment, otherwise the remote-attestation procedure may fail.
 
-Run the script `./setup.sh` in the terminal to make the system ready.
+All the steps required to prepare a Microsoft Azure cloud, SGX-enabled, DC4SV3 instance with an Ubuntu-20.04 Operating System, is encoded into a bash script. So, to prepare the system, first open a new terminal and run the following script:
 
-
-### Install *Gramine* in your system
-
-At first install *Gramine* in your system. For that, in an terminal, issue the following commands in the specified order:
 ```
-sudo curl -fsSLo /usr/share/keyrings/gramine-keyring.gpg https://packages.gramineproject.io/gramine-keyring.gpg
-```
-```
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ $(lsb_release -sc) main" \
-| sudo tee /etc/apt/sources.list.d/gramine.list
-```
-```
-sudo curl -fsSLo /usr/share/keyrings/intel-sgx-deb.asc https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
-```
-```
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-sgx-deb.asc] https://download.01.org/intel-sgx/sgx_repo/ubuntu $(lsb_release -sc) main" \
-| sudo tee /etc/apt/sources.list.d/intel-sgx.list
-```
-```
-sudo apt-get update
-```
-```
-sudo apt-get install gramine
+./setup.sh
 ```
 
-If any problem occurs during this stage, then that may be resolved by following [this detailed guide](https://gramine.readthedocs.io/en/latest/installation.html).
+It should complete its execution, without any error.
 
-### Generate private key for signing the *enclave*
+In other environment, please perform the follwing steps in the proper order.
+### 2.1 Install *Gramine* in your system
+
+How to install *Gramine* in your system can be found in [this detailed guide](https://gramine.readthedocs.io/en/latest/installation.html).
+
+### 2.2 Generate private key for signing the *enclave*
 
 Issue the following command in the terminal to generate *enclave* singing private key.
 
@@ -48,45 +34,40 @@ Issue the following command in the terminal to generate *enclave* singing privat
 gramine-sgx-gen-private-key
 ```
 
-### Install *MBedTLS*
+### 2.3 Install *MBedTLS*
 
-To install the proper MBedTLS in your system, first run the following command:
+To install the proper MBedTLS in your system, run the following command:
 
 ```
 sudo apt install libmbedtls-dev
 ```
 
-### Install required software for compilation
+### 2.4 Install required software for compilation
+
+Some additional software and libraries are required for compilation of the source code, install them run the following command:
 
 ```
 sudo apt-get install gcc make
 sudo apt install pkg-config
+sudo apt install libxml2 libxml2-dev
 ```
-
+<!--
 TODO...more..
 
 <span style="color: red;">Is it really required? Everthing got compiled, even without this. Then, copy all the content from [this particular folder](https://github.com/Mbed-TLS/mbedtls/tree/08b04b11ff55a96f4021e5622b49e28a09417672/include) and overwrite into ***/user/include/*** directory of your machine.</span> 
+-->
 
-### Setup the system for remote attestation
-<span style="color: red;">TODO</span>
+### 3. Verify installation and setup
 
-### Verify installation and setup
+Before proceeding further, it is now important to verify that everything setup till now are fine. Specifically, it is important to ensure that an *enclave* can run in the system in real-SGX mode. Moreover, it must be ensured that, that the remote attestation works properly with that *enclave*.
 
-Run the Gramin's inbuilt remote attestation examples. Detailed steps regarding how to run those, can be found [here](https://github.com/gramineproject/gramine/tree/master/CI-Examples/ra-tls-mbedtls). If you have successfully set your system, then all the ***DCAP***-related examples should run successfully in SGX-mode.
+To verify thes, run the *Gramine*'s inbuilt remote attestation examples in the newly set environment. Detailed steps regarding how to run those, can be found [here](https://github.com/gramineproject/gramine/tree/master/CI-Examples/ra-tls-mbedtls). If you have successfully set your system, then all the ***DCAP***-related examples should run successfully in ***SGX***-mode.
 
-### Install *libxml2*
+## 4. How to run *BPPM*?
+To run $BPPM$, first compile the source code and then run its different components according to some desired workflow.
 
-Install libxml2, by issuing the following command:
-
-```
-sudo apt install libxml2 libxml2-dev
-```
-
-## How to run *BPPM*?
-To run BPPM, first clone this repository into your machine and compile the source code.
-
-### Compile BPPM
-To compile the BPPM source code, goto the poc directory and compile the source using the following commands:
+### 4.1 Compile *BPPM*
+To compile the $BPPM$ source code, goto the ***poc*** directory and compile the source using the following commands:
 
 ```
 cd poc
@@ -103,12 +84,12 @@ Measurement:
 cc src/data_user/data_user.c -O0 -ggdb3 -D ENC_DEF_LOG_LVL=ENCLAVE_LOG_LVL_MIN -D DU_DEF_LOG_LVL=DU_LOG_LVL_MIN -D DO_DEF_LOG_LVL=DO_LOG_LVL_MIN -D CP_DEF_LOG_LVL=CP_LOG_LVL_MIN -fPIE -I/usr/include/gramine -I/usr/include/gramine -I/usr/include/libxml2/ -I./src/include/ -lxml2 -pie -ldl -Wl,--enable-new-dtags -Wl,-rpath,/usr/lib/x86_64-linux-gnu -Wl,--start-group -lmbedcrypto_gramine -lmbedtls_gramine -lmbedx509_gramine -Wl,--end-group -o data_user
 cc src/code_provider/code_provider.c -O0 -ggdb3 -D ENC_DEF_LOG_LVL=ENCLAVE_LOG_LVL_MIN -D DU_DEF_LOG_LVL=DU_LOG_LVL_MIN -D DO_DEF_LOG_LVL=DO_LOG_LVL_MIN -D CP_DEF_LOG_LVL=CP_LOG_LVL_MIN -fPIE -I/usr/include/gramine -I/usr/include/gramine -I/usr/include/libxml2/ -I./src/include/ -lxml2 -pie -ldl -Wl,--enable-new-dtags -Wl,-rpath,/usr/lib/x86_64-linux-gnu -Wl,--start-group -lmbedcrypto_gramine -lmbedtls_gramine -lmbedx509_gramine -Wl,--end-group -o code_provider
 ```
-Now note down the details of the newly generated enclave in the current directory, by issuing the following command:
+Now note down the details of the newly generated *enclave* in the current directory, by issuing the following command:
 
 ```
 gramine-sgx-sigstruct-view enclave.sig
 ```
-It will show something like the following.
+It should show something like the following. However, the hexadecimal strings must be different, in your system.
 
 ```
 Attributes:
@@ -118,23 +99,26 @@ Attributes:
     isv_svn: 0
     debug_enclave: False
 ```
-Note down the observed *mr_signer* and *mr_enclave* values and update *MRENCLAVE_STR* and *MRSIGNER_STR* macros in the *src/include/enclave_details.h* file with those exact same values.
+Note down the observed *mr_signer* and *mr_enclave* values and update *MRENCLAVE_STR* and *MRSIGNER_STR* macros in the *src/include/enclave_details.h* file with those values.
 
 ```
+:
 #define MRENCLAVE_STR "38ec81599b6bcd18ee8cce9cbe3e724aeeb8c0def65c410bd569470584365ea1"
 #define MRSIGNER_STR "9861d25aea36d2112c7db40befbc572a6f1a377b706e78862fcfb4019eb08031"
+:
 ```
-Then again, we have to re-compile everything again with the following command.
+Then again, the entire source code is required to be re-compiled with the following command.
 ```
 make clean
 make
 ```
 
-### Walkthough of BPPM
-TODO: Walkthorough related log level.\
-TODO: Walkthorough picture.
-
-To walkthrough the execution of BPPM, in same terminal first export a couple of environmental variables using the following commands:
+### 4.2 Run a sample walkthough of $BPPM$
+$BPPM$ can be used with different workflows and with different layouts of the data usage tree. The following diagram shows a sample walkthorugh. Supposes, there are only two data users $DU_{1,1}$ and $DU_{2,1}$, residing in two different layers. $DO$ provides some personal data to $DU_{1,1}$. $DU_{1,1}$ can perform some computation on that locally or can forward that to the next layer-data user,$DU_{2,1}$. \
+![Alt text](diagrams/Walkthrough.png?raw=true "Sample walkthorugh of BPPM")
+At first, $DU_{1,1}$ and $DU_{2,1}$ setup their *enclave*. During this time, the $CP$ sends the required code components to those *enclave*s in piracy-protected way. Then $DO$, sends her personal data to $DU_{1,1}$. $DU_{1,1}$ performs some data processing and then forwards the data to $DU_{2,1}$ with reduced consent. Finally, $DU_{2,1}$ performs some data processing in its location.\
+\
+To facilitate the above mentioned walkthrough, a script is already prepared (`sample_protocol_walkthrough.sh`), which executes different parties in the proper order. Before running the script, couple of environmental variables must be exported in the terminal, by issuing the following commands:
 
 ```
 export RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1
@@ -144,12 +128,46 @@ export RA_TLS_ALLOW_SW_HARDENING_NEEDED=1
 export AZDCAP_DEBUG_LOG_LEVEL=ERROR
 export AZDCAP_COLLATERAL_VERSION=v3
 ```
-Then run the script: `sample_protocol_walkthrough.sh` to execute a walkthrough of BPPM. The terminal should show something like this:
+Then run the script: `sample_protocol_walkthrough.sh` to execute the walkthrough.
+
+```
+./sample_protocol_walkthrough.sh
+```
+
+The involved parites must print the transcript in the terminal. On success, the terminal should show something like this:
 
 ```
 :
-TODO
+[ENC: 0002810]  [23-05-2024 19:27:13.709301] Waiting for receiving the data and consent
+[ENC: 0002763]  [23-05-2024 19:27:14.711234] Forwarding data (did: 0) after removing: 20 data processing statements
+[ENC: 0002810]  [23-05-2024 19:27:14.902936] Processed data (did: 0) according to processing statement ID: 1, the result is: 793406281
 ```
-Alternatively, the same thing can be achieved by performing the steps manually.
-i.e.,
+### 4.3 Measure different performance matrices of $BPPM$
+To measure its performance first compile it in release mode. Steps required for compilation are [already mentioned](#41-compile-bppm). But to compile $BPPM$ in release mode, instead of using `make`, use `make DEBUG=0`.
 
+Then export the required environment variables, by issuing the following commands.
+
+```
+export RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1
+export RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1
+export RA_TLS_ALLOW_HW_CONFIG_NEEDED=1
+export RA_TLS_ALLOW_SW_HARDENING_NEEDED=1
+export AZDCAP_DEBUG_LOG_LEVEL=ERROR
+export AZDCAP_COLLATERAL_VERSION=v3
+```
+Then run the following script in the terminal, and follow the on-terminal instructions.
+
+```
+./perf_measurement.sh 100 n
+```
+
+It will take a long time. Maybe 6-8 hours. On success it should show something like the following.
+
+```
+============================================================================================================
+Started performance measurement of BPPM
+Please wait, it will take considerable amount of time...
+
+Performance measurement completed..!! Open the folder Perf_log_23_05_2024_20-08-03/ for detailed reports.
+============================================================================================================
+```
