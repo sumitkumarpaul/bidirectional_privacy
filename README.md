@@ -13,7 +13,7 @@ If you already have a SGX-enabled system, then this step is not required.
 ## 2. How to prepare the system?
 A simple working environment can be created by running all the involved parties (i.e., $DO$, $CP$ and $\forall i,j:DU_{i,j}$) on the same enviroment and enable communication among themselves using local loopback interface. However, internet reachability of is required for the environment, otherwise the remote-attestation procedure may fail.
 
-All the steps required to prepare a Microsoft Azure cloud, SGX-enabled, DC4SV3 instance with an Ubuntu-20.04 Operating System, is encoded into a bash script. So, to prepare the system, first open a new terminal and run the following script:
+All the steps required to prepare a Microsoft Azure cloud, SGX-enabled, DC4SV3 instance with an Ubuntu-20.04 Operating System, is encoded into a bash script. So, to prepare the system, first open a new terminal, go to the folder: `./poc` and run the following script:
 
 ```
 ./setup.sh
@@ -142,6 +142,14 @@ The involved parites must print the transcript in the terminal. On success, the 
 [ENC: 0002763]  [23-05-2024 19:27:14.711234] Forwarding data (did: 0) after removing: 20 data processing statements
 [ENC: 0002810]  [23-05-2024 19:27:14.902936] Processed data (did: 0) according to processing statement ID: 1, the result is: 793406281
 ```
+Due to the use of non-uptodate collateral, some additional print from Microsoft Azure may come like the following:
+
+```
+Azure Quote Provider: libdcap_quoteprov.so [INFO]: Debug Logging Enabled
+WARNING: The collateral is out of date.
+```
+Please ignore them.
+
 ### 4.3 Measure different performance matrices of $BPPM$
 To measure its performance first compile it in release mode. Steps required for compilation are [already mentioned](#41-compile-bppm). But to compile $BPPM$ in release mode, instead of using `make`, use `make DEBUG=0`.
 
