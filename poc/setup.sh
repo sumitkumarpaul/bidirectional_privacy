@@ -29,6 +29,9 @@ mkdir ~/.az-dcap-client
 sudo dpkg -i az-dcap-client_1.12.0_amd64.deb
 rm az-dcap-client_1.12.0_amd64.deb
 
+sudo apt-get update
+sleep 2
+
 # Install other required softwares for compilation
 sudo apt-get install -y gcc make
 sudo apt install -y pkg-config
