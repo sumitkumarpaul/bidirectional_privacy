@@ -15,8 +15,19 @@ sudo apt-get install -y gramine
 # Generate enclave signing-key
 gramine-sgx-gen-private-key
 
-# Install other required softwares
-sudo apt install -y libmbedtls-dev
+# Prepare the system for remote attestation
+sudo apt install -y sgx-aesm-service 
+sudo apt install -y libsgx-aesm-launch-plugin 
+sudo apt install -y libsgx-aesm-quote-ex-plugin 
+sudo apt install -y libsgx-aesm-ecdsa-plugin 
+sudo apt install -y libsgx-dcap-quote-verify
+sudo apt remove -y libsgx-dcap-default-qpl
+# Install DCAP client
+wget https://packages.microsoft.com/ubuntu/20.04/prod/pool/main/a/az-dcap-client/az-dcap-client_1.12.0_amd64.deb
+sudo dpkg -i az-dcap-client_1.12.0_amd64.deb
+rm az-dcap-client_1.12.0_amd64.deb
+
+# Install other required softwares for compilation
 sudo apt-get install -y gcc make
 sudo apt install -y pkg-config
 sudo apt install -y libxml2 libxml2-dev
