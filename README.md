@@ -5,10 +5,11 @@ The involved parties in $BPPM$ are, a data-owner ($DO$), a code-provider ($CP$) 
 
 $BPPM$ is mainly implemented in ***C***-programming language. This implementation is dependent on [Gramine](https://github.com/gramineproject/gramine) shim-library for TEE related operations and on [MBed-TLS](https://github.com/Mbed-TLS/mbedtls/) library for the cryptographic primitives and network operations. **Intel-SGX** is used as the underlying TEE. Specifically, for performing all our development, experimentation and performance measurement purpose, we use an SGX-enabled instance, [DC4SV3](https://learn.microsoft.com/en-us/azure/virtual-machines/dcv3-series) in Microsoft Azure cloud. We use **Ubuntu-20.04** Operating System, in that environment.
 
-## 1. How to create the system?
-Intel-SGX enabled VM can be created in Microsoft-Azure, by following [this guide line](https://learn.microsoft.com/en-us/azure/confidential-computing/quick-create-portal). After creating the system, enable the remote attestation by following [this link](https://learn.microsoft.com/en-us/azure/attestation/quickstart-powershell). This [text](https://learn.microsoft.com/en-us/azure/security/fundamentals/trusted-hardware-identity-management) might also be useful.
+## 1. Procure an Intel-SGX machine
+At first an Intel-SGX enabled computer is required. We use Intel-SGX enabled VM in Microsoft-Azure. Which can be created by following [this guide](https://learn.microsoft.com/en-us/azure/confidential-computing/quick-create-portal).
 
-If you already have a SGX-enabled system, then this step is not required.
+***Note:*** For dry run of the protocol, we created a script `sample_protocol_walkthrough.sh`. This can be executed in non-sgx computer as well. But in that case, the security/privacy guarantees of $BPPM$ do not hold. Moreover, the measured performance will not reflect the real scenario with a real Intel-SGX computer.
+
 
 ## 2. How to prepare the system?
 A simple working environment can be created by running all the involved parties (i.e., $DO$, $CP$ and $\forall i,j:DU_{i,j}$) on the same enviroment and enable communication among themselves using local loopback interface. However, internet reachability of is required for the environment, otherwise the remote-attestation procedure may fail.
@@ -19,9 +20,12 @@ All the steps required to prepare a Microsoft Azure cloud, SGX-enabled, DC4SV3 i
 ./setup.sh
 ```
 
-It should complete its execution, without any error.
+It should complete its execution, without any error. This script installs the required softwares and enables remote attestation in the newly created VM.
 
-In other environment, please perform the follwing steps in the proper order.
+If you are using other environment, please perform the follwing steps in the specified order.
+
+***Note:*** If you are in Microsoft Azure's SGX-enabled DC4SV3 instance and already executed `./setup.sh` successfully, then you can skip the rest of the steps mentioned in *Section 2* and can jump to [*Section 3*](#3-verify-installation-and-setup). 
+
 ### 2.1 Install *Gramine* in your system
 
 How to install *Gramine* in your system can be found in [this detailed guide](https://gramine.readthedocs.io/en/latest/installation.html).
@@ -34,15 +38,7 @@ Issue the following command in the terminal to generate *enclave* singing privat
 gramine-sgx-gen-private-key
 ```
 
-### 2.3 Install *MBedTLS*
-
-To install the proper MBedTLS in your system, run the following command:
-
-```
-sudo apt install libmbedtls-dev
-```
-
-### 2.4 Install required software for compilation
+### 2.3 Install required software for compilation
 
 Some additional software and libraries are required for compilation of the source code, install them run the following command:
 
@@ -56,6 +52,10 @@ TODO...more..
 
 <span style="color: red;">Is it really required? Everthing got compiled, even without this. Then, copy all the content from [this particular folder](https://github.com/Mbed-TLS/mbedtls/tree/08b04b11ff55a96f4021e5622b49e28a09417672/include) and overwrite into ***/user/include/*** directory of your machine.</span> 
 -->
+
+### 2.4 Enable DCAP attestation
+
+After installing the required software in the system, enable the DCAP attestation in it. It might be relatively complicated and may change on system to system. An intial guide for enabling DCAP in Intel-SGX desktops or servers can be found [here](https://www.intel.com/content/www/us/en/developer/articles/guide/intel-software-guard-extensions-data-center-attestation-primitives-quick-install-guide.html).
 
 ### 3. Verify installation and setup
 
@@ -150,8 +150,11 @@ WARNING: The collateral is out of date.
 ```
 Please ignore them.
 
+
+***Note:*** As mentioned earlier, for dry run of the protocol in non-sgx computer, please run `sample_protocol_walkthrough.sh` in non-sgx mode. But in that case, the security/privacy guarantees of $BPPM$ do not hold. Moreover, the measured performance will not reflect the real scenario with a real Intel-SGX computer.
+
 ### 4.3 Measure different performance matrices of $BPPM$
-To measure its performance first compile it in release mode. Steps required for compilation are [already mentioned](#41-compile-bppm). But to compile $BPPM$ in release mode, instead of using `make`, use `make DEBUG=0`.
+To measure its performance first compile it in release mode. Steps required for compilation are already mentioned in [*Section 4.1*](#41-compile-bppm). But to compile $BPPM$ in release mode, instead of using `make`, use `make DEBUG=0`.
 
 Then export the required environment variables, by issuing the following commands.
 
