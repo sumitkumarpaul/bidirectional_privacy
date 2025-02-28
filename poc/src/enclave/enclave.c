@@ -49,7 +49,7 @@
 unsigned int SAVED_LOG_LVL;
 unsigned int ENCLAVE_LOG_LVL = ENC_DEF_LOG_LVL;
 
-#define DEBUG_LEVEL 5
+#define MBEDTLS_DEBUG_LEVEL 0 /* Set 0 for no print, 5 for all verbose. Other values for in between */
 
 #define CA_CRT_PATH "ssl/ca.crt"
 #define SRV_CRT_PATH "ssl/enclave.crt"
@@ -684,7 +684,7 @@ static int ssl_server_init()
     char port[6] = {0};
 
 #if defined(MBEDTLS_DEBUG_C)
-    mbedtls_debug_set_threshold(DEBUG_LEVEL);
+    mbedtls_debug_set_threshold(MBEDTLS_DEBUG_LEVEL);
 #endif
 
     mbedtls_net_init(&ssl_server_listen_fd);
@@ -694,6 +694,14 @@ static int ssl_server_init()
     mbedtls_pk_init(&ssl_server_pkey);
     mbedtls_entropy_init(&ssl_server_entropy);
     mbedtls_ctr_drbg_init(&ssl_server_ctr_drbg);
+
+#if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_SSL_PROTO_TLS1_3)
+    psa_status_t status = psa_crypto_init();
+    if (status != PSA_SUCCESS) {
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed to initialize PSA Crypto implementation: %d\n", (int)status);
+        return 1;
+    }
+#endif /* MBEDTLS_USE_PSA_CRYPTO || MBEDTLS_SSL_PROTO_TLS1_3 */
 
     // SSL's port must be one more than the local DU's port
     ssl_server_listening_port = lcl_du_listening_port + 1;
@@ -887,6 +895,10 @@ static void ssl_server_fin()
     mbedtls_ssl_config_free(&ssl_server_conf);
     mbedtls_ctr_drbg_free(&ssl_server_ctr_drbg);
     mbedtls_entropy_free(&ssl_server_entropy);
+
+#if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_SSL_PROTO_TLS1_3)
+    mbedtls_psa_crypto_free();
+#endif /* MBEDTLS_USE_PSA_CRYPTO || MBEDTLS_SSL_PROTO_TLS1_3 */    
 
     free(der_key);
     der_key = NULL;
@@ -1626,7 +1638,7 @@ static int ssl_client_connect(const char* IP, const char* port)
     struct ra_tls_verify_callback_results my_verify_callback_results = {0};
 
 #if defined(MBEDTLS_DEBUG_C)
-    mbedtls_debug_set_threshold(DEBUG_LEVEL);
+    mbedtls_debug_set_threshold(MBEDTLS_DEBUG_LEVEL);
 #endif
 
     mbedtls_net_init(&ssl_client_server_fd);
@@ -1635,6 +1647,14 @@ static int ssl_client_connect(const char* IP, const char* port)
     mbedtls_ctr_drbg_init(&ssl_client_ctr_drbg);
     mbedtls_x509_crt_init(&ssl_client_cacert);
     mbedtls_entropy_init(&ssl_client_entropy);
+
+#if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_SSL_PROTO_TLS1_3)
+    psa_status_t status = psa_crypto_init();
+    if (status != PSA_SUCCESS) {
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed to initialize PSA Crypto implementation: %d\n", (int)status);
+        return 1;
+    }
+#endif /* MBEDTLS_USE_PSA_CRYPTO || MBEDTLS_SSL_PROTO_TLS1_3 */
 
     if (g_in_sgx)
     {
@@ -1941,6 +1961,10 @@ static void ssl_client_close()
     mbedtls_ssl_config_free(&ssl_client_conf);
     mbedtls_ssl_free(&ssl_client_ssl);
     mbedtls_net_free(&ssl_client_server_fd);
+
+#if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_SSL_PROTO_TLS1_3)
+    mbedtls_psa_crypto_free();
+#endif /* MBEDTLS_USE_PSA_CRYPTO || MBEDTLS_SSL_PROTO_TLS1_3 */    
 
     return;
 }
@@ -2969,6 +2993,7 @@ static int AE_Kgen(char *pk_buf, size_t pk_buf_sz, size_t *o_pk_sz, char *sk_buf
     mbedtls_ctr_drbg_init(&ctr_drbg);
 
     mbedtls_entropy_init(&entropy);
+    
 
     if ((ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
                                      (const unsigned char *)pers,

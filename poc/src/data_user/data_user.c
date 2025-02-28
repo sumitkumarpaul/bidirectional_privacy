@@ -434,6 +434,14 @@ static int ssl_server_init() {
     mbedtls_entropy_init(&ssl_server_entropy);
     mbedtls_ctr_drbg_init(&ssl_server_ctr_drbg);
 
+#if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_SSL_PROTO_TLS1_3)
+    psa_status_t status = psa_crypto_init();
+    if (status != PSA_SUCCESS) {
+        enclave_print_log(DU_LOG_LVL_ERROR, 1, "Failed to initialize PSA Crypto implementation: %d\n", (int)status);
+        return 1;
+    }
+#endif /* MBEDTLS_USE_PSA_CRYPTO || MBEDTLS_SSL_PROTO_TLS1_3 */
+
     //SSL's port must be one more than the local DU's port
     ssl_server_listening_port = lcl_du_listening_port + 1;
     sprintf(port, "%d", ssl_server_listening_port);
@@ -589,6 +597,10 @@ static void ssl_server_fin() {
     mbedtls_ssl_config_free(&ssl_server_conf);
     mbedtls_ctr_drbg_free(&ssl_server_ctr_drbg);
     mbedtls_entropy_free(&ssl_server_entropy);
+
+#if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_SSL_PROTO_TLS1_3)
+    mbedtls_psa_crypto_free();
+#endif /* MBEDTLS_USE_PSA_CRYPTO || MBEDTLS_SSL_PROTO_TLS1_3 */
 
     free(der_key);
     free(der_crt);
@@ -918,6 +930,14 @@ static int ssl_client_connect() {
     mbedtls_x509_crt_init(&ssl_client_cacert);
     mbedtls_entropy_init(&ssl_client_entropy);
 
+#if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_SSL_PROTO_TLS1_3)
+    psa_status_t status = psa_crypto_init();
+    if (status != PSA_SUCCESS) {
+        enclave_print_log(DU_LOG_LVL_ERROR, 1, "Failed to initialize PSA Crypto implementation: %d\n", (int)status);
+        return 1;
+    }
+#endif /* MBEDTLS_USE_PSA_CRYPTO || MBEDTLS_SSL_PROTO_TLS1_3 */
+
     /*
      * RA-TLS verification with DCAP inside SGX enclave uses dummies instead of real
      * functions from libsgx_urts.so, thus we don't need to load this helper library.
@@ -1206,6 +1226,10 @@ static void ssl_client_close() {
     mbedtls_ssl_config_free(&ssl_client_conf);
     mbedtls_ssl_free(&ssl_client_ssl);
     mbedtls_net_free(&ssl_client_server_fd);
+
+#if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_SSL_PROTO_TLS1_3)
+    mbedtls_psa_crypto_free();
+#endif /* MBEDTLS_USE_PSA_CRYPTO || MBEDTLS_SSL_PROTO_TLS1_3 */
 
     return;
 }

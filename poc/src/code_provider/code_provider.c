@@ -48,7 +48,7 @@
 unsigned int SAVED_LOG_LVL;
 unsigned int CP_LOG_LVL = CP_DEF_LOG_LVL;
 
-#define DEBUG_LEVEL 5
+#define MBEDTLS_DEBUG_LEVEL 0 /* Set 0 for no print, 5 for all verbose. Other values for in between */
 
 #define CA_CRT_PATH "ssl/ca.crt"
 #define BUF1_SZ 1024
@@ -432,7 +432,7 @@ static int ssl_client_connect()
     struct ra_tls_verify_callback_results my_verify_callback_results = {0};
 
 #if defined(MBEDTLS_DEBUG_C)
-    mbedtls_debug_set_threshold(DEBUG_LEVEL);
+    mbedtls_debug_set_threshold(MBEDTLS_DEBUG_LEVEL);
 #endif
 
     mbedtls_net_init(&ssl_client_server_fd);
@@ -441,6 +441,14 @@ static int ssl_client_connect()
     mbedtls_ctr_drbg_init(&ssl_client_ctr_drbg);
     mbedtls_x509_crt_init(&ssl_client_cacert);
     mbedtls_entropy_init(&ssl_client_entropy);
+
+#if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_SSL_PROTO_TLS1_3)
+    psa_status_t status = psa_crypto_init();
+    if (status != PSA_SUCCESS) {
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed to initialize PSA Crypto implementation: %d\n", (int)status);
+        return 1;
+    }
+#endif /* MBEDTLS_USE_PSA_CRYPTO || MBEDTLS_SSL_PROTO_TLS1_3 */
 
     /*
      * RA-TLS verification with DCAP inside SGX enclave uses dummies instead of real
@@ -733,6 +741,10 @@ static void ssl_client_close()
     mbedtls_ssl_config_free(&ssl_client_conf);
     mbedtls_ssl_free(&ssl_client_ssl);
     mbedtls_net_free(&ssl_client_server_fd);
+
+#if defined(MBEDTLS_USE_PSA_CRYPTO) || defined(MBEDTLS_SSL_PROTO_TLS1_3)
+    mbedtls_psa_crypto_free();
+#endif /* MBEDTLS_USE_PSA_CRYPTO || MBEDTLS_SSL_PROTO_TLS1_3 */
 
     return;
 }

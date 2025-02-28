@@ -1,6 +1,6 @@
-# TPPM enclave's manifest file example
+# BPPM enclave's manifest file example
 
-loader.entrypoint = "file:{{ gramine.libos }}"
+loader.entrypoint.uri = "file:{{ gramine.libos }}"
 libos.entrypoint = "/enclave"
 
 loader.log_level = "{{ log_level }}"
