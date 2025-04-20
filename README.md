@@ -1,5 +1,5 @@
 # Bidirectional Privacy
-This repository contains the prototype implementation of the $BPPM$-framework, which provides *Bidirectional Privacy-Preservation with Multi-Layer Data Sharing*.
+This repository contains the prototype implementation of the $BPPM$-framework, which provides *Bidirectional Privacy-Preservation for Multi-layer Data Sharing in Web Services*.
 
 The involved parties in $BPPM$ are, a data-owner ($DO$), a code-provider ($CP$) and a few data-users distributed among multiple layers. $DU_{i,j}$ denotes the $j^{th}$-data-user of $i^{th}$-layer. $\forall i,j:DU_{i,j}$ requires an environment having support of the, Trusted Execution Environment (TEE) and others do not require TEE.
 
@@ -179,6 +179,6 @@ It will take a long time. Maybe 6-8 hours. On success it should show something l
 Started performance measurement of BPPM
 Please wait, it will take considerable amount of time...
 
-Performance measurement completed..!! Open the folder Perf_log_23_05_2024_20-08-03/ for detailed reports.
+Performance measurement completed..!! Open the folder Perf_log_<DD>_<MM>_<YYYY>_<HH>-<MM>-<SS>/ for detailed reports.
 ============================================================================================================
 ```
