@@ -48,7 +48,7 @@
 unsigned int SAVED_LOG_LVL;
 unsigned int CP_LOG_LVL = CP_DEF_LOG_LVL;
 
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 5
 
 #define CA_CRT_PATH "ssl/ca.crt"
 #define BUF1_SZ 1024
@@ -102,7 +102,7 @@ static void lcl_du_if_fin();
 static int lcl_du_con_accept();
 static void lcl_du_con_close();
 static int execute_GetCode();
-static void cp_print_log(int enclave_dbg_lvl, int do_flush, const char *fmt, ...);
+static void cp_print_log(int enclave_dbg_lvl, int do_flush, const char *func_name, unsigned int line, const char *fmt, ...);
 static void ssl_debug(void *ctx, int level, const char *file, int line, const char *str);
 static int ssl_client_connect();
 static void ssl_client_close();
@@ -118,21 +118,21 @@ int main(int argc, char **argv)
 
     if (argc <= 2)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 0, "Usage error..!!\nRun: ./code_provider <listening TCP port> <use_sgx:sgx/non-sgx>\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 0, __func__, __LINE__, "Usage error..!!\nRun: ./code_provider <listening TCP port> <use_sgx:sgx/non-sgx>\n");
         goto exit;
     }
 
     if (!strcmp(argv[2], "non-sgx"))
     {
         non_sgx_du = true;
-        cp_print_log(CP_LOG_LVL_INFO, 1, "Running CP in non-sgx mode\n");
+        cp_print_log(CP_LOG_LVL_INFO, 1, __func__, __LINE__, "Running CP in non-sgx mode\n");
     }
 
     ret = com_ch_init(argv[1]);
 
     if (ret != 0)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 0, "Failed to initialize the listening port..!!\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 0, __func__, __LINE__, "Failed to initialize the listening port..!!\n");
         goto exit;
     }
 
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
     }
 
 exit:
-    cp_print_log(CP_LOG_LVL_INFO, 0, "Destroying the enclave..!!\n");
+    cp_print_log(CP_LOG_LVL_INFO, 0, __func__, __LINE__, "Destroying the enclave..!!\n");
     com_ch_fin();
     fflush(stdout);
 
@@ -157,14 +157,14 @@ static int com_ch_init(const char *local_port)
 
     if (ret != 0)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 0, "Failed setting up the local TCP communication interface with the hosting DU..!!\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 0, __func__, __LINE__, "Failed setting up the local TCP communication interface with the hosting DU..!!\n");
         goto exit;
     }
 
 exit:
     if (ret != 0)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 0, "Destroying the listning TCP interface with DU..!!\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 0, __func__, __LINE__, "Destroying the listning TCP interface with DU..!!\n");
         com_ch_fin();
     }
 
@@ -192,19 +192,19 @@ static void execute_commands()
 
     if (ret != 0)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 0, "Failed to listen on the local TCP interface with DU..!!\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 0, __func__, __LINE__, "Failed to listen on the local TCP interface with DU..!!\n");
         goto exit;
     }
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, "New connection accepted, now listening for commands from DU..\n");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "New connection accepted, now listening for commands from DU..\n");
 
     while (1) {
         ret = mbedtls_net_recv(&lcl_client_fd, buf1, BUF1_SZ);
 
         if (ret <= 0)
         {
-            cp_print_log(CP_LOG_LVL_ERROR, 0, "Error during command reception from DU. Error is: %d\n", ret);
-            cp_print_log(CP_LOG_LVL_ERROR, 0, "Stopping command processing..\n");
+            cp_print_log(CP_LOG_LVL_ERROR, 0, __func__, __LINE__, "Error during command reception from DU. Error is: %d\n", ret);
+            cp_print_log(CP_LOG_LVL_ERROR, 0, __func__, __LINE__, "Stopping command processing..\n");
             goto exit;
         }
 
@@ -237,7 +237,7 @@ static void execute_commands()
 
                             if (ret < 0)
                             {
-                                cp_print_log(CP_LOG_LVL_ERROR, 0, "Error while connecting with the enclave. Ret = %d\n", ret);
+                                cp_print_log(CP_LOG_LVL_ERROR, 0, __func__, __LINE__, "Error while connecting with the enclave. Ret = %d\n", ret);
                                 goto exit;
                             }
                             is_connected = 1;
@@ -249,17 +249,17 @@ static void execute_commands()
             }
         }
         else if ((cmd != NULL) && (strncmp(buf1, "CloseCP", strlen("CloseCP")) == 0)){
-            cp_print_log(CP_LOG_LVL_INFO, 1, "Received close request from the enclave\n");
+            cp_print_log(CP_LOG_LVL_INFO, 1, __func__, __LINE__, "Received close request from the enclave\n");
             break;
         }
         else
         {
-            cp_print_log(CP_LOG_LVL_ERROR, 1, "Received unknown command: %s\n", buf1); // Sumit may happen buffer overflow
+            cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Received unknown command: %s\n", buf1); // Sumit may happen buffer overflow
             break;
         }
     }
 
-    cp_print_log(CP_LOG_LVL_MIN, 1, "Sent requested code components to the data-user's enclave in piracy-protected format\n");
+    cp_print_log(CP_LOG_LVL_MIN, 1, __func__, __LINE__, "Sent requested code components to the data-user's enclave in piracy-protected format\n");
 
     is_connected = 0;
 exit:
@@ -279,11 +279,11 @@ static int lcl_du_if_init(const char *port)
 
     if (ret != 0)
     {
-        cp_print_log(CP_LOG_LVL_ALL, 1, " failed\n  ! mbedtls_net_bind returned %d\n\n", ret);
+        cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, " failed\n  ! mbedtls_net_bind returned %d\n\n", ret);
         goto exit;
     }
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, "Successfully bounded the local interface with TCP port: %s\n", port);
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "Successfully bounded the local interface with TCP port: %s\n", port);
 
     lcl_du_listening_port = atoi(port);
 exit:
@@ -292,7 +292,7 @@ exit:
 #ifdef MBEDTLS_ERROR_C
         char error_buf[100];
         mbedtls_strerror(ret, error_buf, sizeof(error_buf));
-        cp_print_log(CP_LOG_LVL_ALL, 1, "Last error was: %d - %s\n\n", ret, error_buf);
+        cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "Last error was: %d - %s\n\n", ret, error_buf);
 #endif
         lcl_du_if_fin();
     }
@@ -314,17 +314,17 @@ static int lcl_du_con_accept()
 
     mbedtls_net_init(&lcl_client_fd);
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, "  . Waiting for a connection request from DU...\n");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Waiting for a connection request from DU...\n");
 
     ret = mbedtls_net_accept(&lcl_listen_fd, &lcl_client_fd, NULL, 0, NULL);
 
     if (ret != 0)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 0, " failed\n  ! mbedtls_net_accept returned %d\n\n", ret);
+        cp_print_log(CP_LOG_LVL_ERROR, 0, __func__, __LINE__, " failed\n  ! mbedtls_net_accept returned %d\n\n", ret);
         goto exit;
     }
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, " Established TCP connection with local DU\n");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, " Established TCP connection with local DU\n");
 
 exit:
     if (ret != 0)
@@ -332,7 +332,7 @@ exit:
 #ifdef MBEDTLS_ERROR_C
         char error_buf[100];
         mbedtls_strerror(ret, error_buf, sizeof(error_buf));
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "Last error was: %d - %s\n\n", ret, error_buf);
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Last error was: %d - %s\n\n", ret, error_buf);
 #endif
         lcl_du_con_close();
     }
@@ -354,20 +354,20 @@ static int execute_GetCode()
     int code_id;
     int i;
 
-    cp_print_log(CP_LOG_LVL_INFO, 0, "Obtained request is: %s, %s, %s\n", req_s, du_ip, du_enc_port);
+    cp_print_log(CP_LOG_LVL_INFO, 0, __func__, __LINE__, "Obtained request is: %s, %s, %s\n", req_s, du_ip, du_enc_port);
 
     code_id = atoi(req_s);
 
     /* For the experiment purpose alternatively send ten different code only */
     sprintf(filename, "./code_library/code_%d/code_%d.so", (code_id % 10), (code_id % 10));
 
-    cp_print_log(CP_LOG_LVL_INFO, 1, "Sending the file: %s from CP to the requested DU\n", filename);
+    cp_print_log(CP_LOG_LVL_INFO, 1, __func__, __LINE__, "Sending the file: %s from CP to the requested DU\n", filename);
   
     ret = ssl_send_padded_file(&ssl_client_ssl, filename, PADDED_CODE_SZ);
 
     if (ret < 0)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "ssl_send_padded_file returned error: %d\n", ret);
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "ssl_send_padded_file returned error: %d\n", ret);
         goto exit;
     }
 
@@ -377,7 +377,7 @@ exit:
     return ret;
 }
 
-static void cp_print_log(int enclave_dbg_lvl, int do_flush, const char *fmt, ...)
+static void cp_print_log(int enclave_dbg_lvl, int do_flush, const char *func_name, unsigned int line, const char *fmt, ...)
 {
     int printed_size = 0;
     struct timezone tz;
@@ -392,7 +392,7 @@ static void cp_print_log(int enclave_dbg_lvl, int do_flush, const char *fmt, ...
 
         if (now != NULL)
         {
-            printed_size = snprintf(print_buf, PRINT_BUF_SZ, "[CP]\t\t[%02d-%02d-%04d %02d:%02d:%02d.%06ld] ", now->tm_mday, (now->tm_mon + 1), (now->tm_year + 1900), now->tm_hour, now->tm_min, now->tm_sec, tv.tv_usec);
+            printed_size = snprintf(print_buf, PRINT_BUF_SZ, "[CP]\t\t[%02d-%02d-%04d %02d:%02d:%02d.%06ld] %s() Line:%04u: ", now->tm_mday, (now->tm_mon + 1), (now->tm_year + 1900), now->tm_hour, now->tm_min, now->tm_sec, tv.tv_usec, func_name, line);
         }
 
         va_start(ap, fmt);
@@ -449,15 +449,15 @@ static int ssl_client_connect()
     ra_tls_verify_lib = dlopen("libra_tls_verify_dcap_gramine.so", RTLD_LAZY);
     if (!ra_tls_verify_lib)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "%s\n", dlerror());
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "User requested RA-TLS verification with DCAP inside SGX but cannot find lib\n");
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "Please make sure that you are using client_dcap.manifest\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "%s\n", dlerror());
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "User requested RA-TLS verification with DCAP inside SGX but cannot find lib\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Please make sure that you are using client_dcap.manifest\n");
         return 1;
     }
 
     if (non_sgx_du == true)
     {
-        cp_print_log(CP_LOG_LVL_INFO, 1, "!!!!!!!!!!!!!!!!!!!!!!!!! [ using normal TLS flow ]!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+        cp_print_log(CP_LOG_LVL_INFO, 1, __func__, __LINE__, "!!!!!!!!!!!!!!!!!!!!!!!!! [ using normal TLS flow ]!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
     }
     else
     {
@@ -465,18 +465,18 @@ static int ssl_client_connect()
                                                       "ra_tls_verify_callback_extended_der");
         if ((error = dlerror()) != NULL)
         {
-            cp_print_log(CP_LOG_LVL_ERROR, 1, "%s\n", error);
+            cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "%s\n", error);
             return 1;
         }
 
         ra_tls_set_measurement_callback_f = dlsym(ra_tls_verify_lib, "ra_tls_set_measurement_callback");
         if ((error = dlerror()) != NULL)
         {
-            cp_print_log(CP_LOG_LVL_ERROR, 1, "%s\n", error);
+            cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "%s\n", error);
             return 1;
         }
 
-        cp_print_log(CP_LOG_LVL_ALL, 1, "[ using our own SGX-measurement verification callback"
+        cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "[ using our own SGX-measurement verification callback"
                                                " (via command line options) ]\n");
 
         g_verify_mrenclave = true;
@@ -488,83 +488,83 @@ static int ssl_client_connect()
 
         if (parse_hex(MRENCLAVE_STR, g_expected_mrenclave, sizeof(g_expected_mrenclave)) < 0)
         {
-            cp_print_log(CP_LOG_LVL_ERROR, 1, "Cannot parse the mrenclave\n");
+            cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot parse the mrenclave\n");
             return 1;
         }
 
         if (parse_hex(MRSIGNER_STR, g_expected_mrsigner, sizeof(g_expected_mrsigner)) < 0)
         {
-            cp_print_log(CP_LOG_LVL_ERROR, 1, "Cannot parse the mrsigner\n");
+            cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot parse the mrsigner\n");
             return 1;
         }
 
         if (parse_hex(ISV_PROD_ID_STR, g_expected_isv_prod_id, sizeof(g_expected_isv_prod_id)) < 0)
         {
-            cp_print_log(CP_LOG_LVL_ERROR, 1, "Cannot parse the isv_prod_id\n");
+            cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot parse the isv_prod_id\n");
             return 1;
         }
 
         if (parse_hex(ISV_SVN_STR, g_expected_isv_svn, sizeof(g_expected_isv_svn)) < 0)
         {
-            cp_print_log(CP_LOG_LVL_ERROR, 1, "Cannot parse the isv_svn\n");
+            cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot parse the isv_svn\n");
             return 1;
         }
     }
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, "\n  . Seeding the random number generator...");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "\n  . Seeding the random number generator...");
 
     ret = mbedtls_ctr_drbg_seed(&ssl_client_ctr_drbg, mbedtls_entropy_func, &ssl_client_entropy,
                                 (const unsigned char *)pers, strlen(pers));
     if (ret != 0)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ctr_drbg_seed returned %d\n", ret);
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ctr_drbg_seed returned %d\n", ret);
         goto exit;
     }
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, " ok\n");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, "  . Connecting to tcp/%s/%s...", du_ip, du_enc_port);
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Connecting to tcp/%s/%s...", du_ip, du_enc_port);
 
     ret = mbedtls_net_connect(&ssl_client_server_fd, du_ip, du_enc_port, MBEDTLS_NET_PROTO_TCP);
     if (ret != 0)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_net_connect returned %d\n\n", ret);
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_net_connect returned %d\n\n", ret);
         goto exit;
     }
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, " ok\n");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, "  . Setting up the SSL/TLS structure...");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Setting up the SSL/TLS structure...");
 
     ret = mbedtls_ssl_config_defaults(&ssl_client_conf, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM,
                                       MBEDTLS_SSL_PRESET_DEFAULT);
     if (ret != 0)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_config_defaults returned %d\n\n", ret);
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_config_defaults returned %d\n\n", ret);
         goto exit;
     }
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, " ok\n");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, "  . Loading the CA root certificate ...");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Loading the CA root certificate ...");
 
     ret = mbedtls_x509_crt_parse_file(&ssl_client_cacert, CA_CRT_PATH);
     if (ret < 0)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, " failed\n  !  mbedtls_x509_crt_parse_file returned -0x%x\n\n", -ret);
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  !  mbedtls_x509_crt_parse_file returned -0x%x\n\n", -ret);
         goto exit;
     }
 
     mbedtls_ssl_conf_authmode(&ssl_client_conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
     mbedtls_ssl_conf_ca_chain(&ssl_client_conf, &ssl_client_cacert, NULL);
-    cp_print_log(CP_LOG_LVL_ALL, 1, " ok\n");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
     if ((ra_tls_verify_lib != NULL) && (non_sgx_du == false))
     {
         /* use RA-TLS verification callback; this will overwrite CA chain set up above */
-        cp_print_log(CP_LOG_LVL_ALL, 1, "  . Installing RA-TLS callback ...");
+        cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Installing RA-TLS callback ...");
         mbedtls_ssl_conf_verify(&ssl_client_conf, &my_verify_callback, &my_verify_callback_results);
-        cp_print_log(CP_LOG_LVL_ALL, 1, " ok\n");
+        cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
     }
 
     mbedtls_ssl_conf_rng(&ssl_client_conf, mbedtls_ctr_drbg_random, &ssl_client_ctr_drbg);
@@ -573,53 +573,53 @@ static int ssl_client_connect()
     ret = mbedtls_ssl_setup(&ssl_client_ssl, &ssl_client_conf);
     if (ret != 0)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_setup returned %d\n\n", ret);
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_setup returned %d\n\n", ret);
         goto exit;
     }
 
     ret = mbedtls_ssl_set_hostname(&ssl_client_ssl, du_ip);
     if (ret != 0)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_set_hostname returned %d\n\n", ret);
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_set_hostname returned %d\n\n", ret);
         goto exit;
     }
 
     mbedtls_ssl_set_bio(&ssl_client_ssl, &ssl_client_server_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, "  . Performing the SSL/TLS handshake...");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Performing the SSL/TLS handshake...");
 
     while ((ret = mbedtls_ssl_handshake(&ssl_client_ssl)) != 0)
     {
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
-            cp_print_log(CP_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_handshake returned -0x%x\n", -ret);
-            cp_print_log(CP_LOG_LVL_ERROR, 1, "  ! ra_tls_verify_callback_results:\n"
+            cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_handshake returned -0x%x\n", -ret);
+            cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "  ! ra_tls_verify_callback_results:\n"
                                                    "    attestation_scheme=%d, err_loc=%d, \n",
                               my_verify_callback_results.attestation_scheme,
                               my_verify_callback_results.err_loc);
             switch (my_verify_callback_results.attestation_scheme)
             {
             case RA_TLS_ATTESTATION_SCHEME_EPID:
-                cp_print_log(CP_LOG_LVL_ERROR, 1, "    epid.ias_enclave_quote_status=%s\n\n",
+                cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "    epid.ias_enclave_quote_status=%s\n\n",
                                   my_verify_callback_results.epid.ias_enclave_quote_status);
                 break;
             case RA_TLS_ATTESTATION_SCHEME_DCAP:
-                cp_print_log(CP_LOG_LVL_ERROR, 1, "    dcap.func_verify_quote_result=0x%x, "
+                cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "    dcap.func_verify_quote_result=0x%x, "
                                                        "dcap.quote_verification_result=0x%x\n\n",
                                   my_verify_callback_results.dcap.func_verify_quote_result,
                                   my_verify_callback_results.dcap.quote_verification_result);
                     if (my_verify_callback_results.err_loc == 3) {
-                        cp_print_log(CP_LOG_LVL_ERROR, 1,"!!!!! Probably the environment variables are not set on the terminal\n");
+                        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__,"!!!!! Probably the environment variables are not set on the terminal\n");
                     }
                     else if (my_verify_callback_results.err_loc == 5) {
-                        cp_print_log(CP_LOG_LVL_ERROR, 1,"!!!!! Probably the code is not compiled with correct details of the enclave\n");
+                        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__,"!!!!! Probably the code is not compiled with correct details of the enclave\n");
                     }
                     else {
-                        cp_print_log(CP_LOG_LVL_ERROR, 1,"Unknown reason\n");
+                        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__,"Unknown reason\n");
                     }
                 break;
             default:
-                cp_print_log(CP_LOG_LVL_ERROR, 1, "  ! unknown attestation scheme!\n\n");
+                cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "  ! unknown attestation scheme!\n\n");
                 break;
             }
 
@@ -627,24 +627,24 @@ static int ssl_client_connect()
         }
     }
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, " ok\n");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, "  . Verifying peer X.509 certificate...");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Verifying peer X.509 certificate...");
 
     flags = mbedtls_ssl_get_verify_result(&ssl_client_ssl);
     if (flags != 0)
     {
         char vrfy_buf[512];
-        cp_print_log(CP_LOG_LVL_ERROR, 1, " failed\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n");
         mbedtls_x509_crt_verify_info(vrfy_buf, sizeof(vrfy_buf), "  ! ", flags);
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "%s\n", vrfy_buf);
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "%s\n", vrfy_buf);
 
         /* verification failed for whatever reason, fail loudly */
         goto exit;
     }
     else
     {
-        cp_print_log(CP_LOG_LVL_ALL, 1, " ok\n");
+        cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
     }
 
     exit_code = EXIT_SUCCESS;
@@ -654,7 +654,7 @@ exit:
     {
         char error_buf[100];
         mbedtls_strerror(ret, error_buf, sizeof(error_buf));
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "Last error was: %d - %s\n\n", ret, error_buf);
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Last error was: %d - %s\n\n", ret, error_buf);
         ssl_client_close();
     }
 #endif
@@ -671,28 +671,28 @@ static int my_verify_measurements(const char *mrenclave, const char *mrsigner,
     if (g_verify_mrenclave &&
         memcmp(mrenclave, g_expected_mrenclave, sizeof(g_expected_mrenclave)))
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "Mismatch in MRENCLAVE value\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Mismatch in MRENCLAVE value\n");
         return -1;
     }
 
     if (g_verify_mrsigner &&
         memcmp(mrsigner, g_expected_mrsigner, sizeof(g_expected_mrsigner)))
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "Mismatch in MRSIGNER value\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Mismatch in MRSIGNER value\n");
         return -1;
     }
 
     if (g_verify_isv_prod_id &&
         memcmp(isv_prod_id, g_expected_isv_prod_id, sizeof(g_expected_isv_prod_id)))
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "Mismatch in ISV_PROD_ID value\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Mismatch in ISV_PROD_ID value\n");
         return -1;
     }
 
     if (g_verify_isv_svn &&
         memcmp(isv_svn, g_expected_isv_svn, sizeof(g_expected_isv_svn)))
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "Mismatch in ISV_SVN value\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Mismatch in ISV_SVN value\n");
         return -1;
     }
 
@@ -720,7 +720,7 @@ static int my_verify_callback(void *data, mbedtls_x509_crt *crt, int depth, uint
 
 static void ssl_client_close()
 {
-    cp_print_log(CP_LOG_LVL_ALL, 1, "  . Closing the connection...\n");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Closing the connection...\n");
 
     (void)mbedtls_ssl_close_notify(&ssl_client_ssl);
 
@@ -742,7 +742,7 @@ static int ssl_read_data(mbedtls_ssl_context *p_ssl, char *read_buf, int max_rea
     int ret;
     int len = max_read_len - 1;
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, "  < Reading data from established ssl connection:");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "  < Reading data from established ssl connection:");
     memset(read_buf, 0, max_read_len);
 
     do
@@ -760,11 +760,11 @@ static int ssl_read_data(mbedtls_ssl_context *p_ssl, char *read_buf, int max_rea
             switch (ret)
             {
             case MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY:
-                cp_print_log(CP_LOG_LVL_ERROR, 1, " connection was closed gracefully\n");
+                cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, " connection was closed gracefully\n");
                 break;
 
             case MBEDTLS_ERR_NET_CONN_RESET:
-                cp_print_log(CP_LOG_LVL_ERROR, 1, " connection was reset by peer\n");
+                cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, " connection was reset by peer\n");
                 break;
             
             /* 0 size may be obtained for ack from other end */
@@ -772,7 +772,7 @@ static int ssl_read_data(mbedtls_ssl_context *p_ssl, char *read_buf, int max_rea
                 break;
 
             default:
-                cp_print_log(CP_LOG_LVL_ERROR, 1, " mbedtls_ssl_read returned -0x%x\n", -ret);
+                cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, " mbedtls_ssl_read returned -0x%x\n", -ret);
                 break;
             }
 
@@ -780,7 +780,7 @@ static int ssl_read_data(mbedtls_ssl_context *p_ssl, char *read_buf, int max_rea
         }
 
         len = ret;
-        cp_print_log(CP_LOG_LVL_ALL, 1, " %lu bytes read\n", len);
+        cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, " %lu bytes read\n", len);
 
         if (ret > 0)
             break;
@@ -795,25 +795,25 @@ static int ssl_write_data(mbedtls_ssl_context *p_ssl, char *write_buf, int write
     int ret;
     int written_len;
 
-    cp_print_log(CP_LOG_LVL_ALL, 1, "  > Write data to established ssl connection:");
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "  > Write data to established ssl connection:");
 
     while ((ret = mbedtls_ssl_write(p_ssl, write_buf, write_len)) <= 0)
     {
         if (ret == MBEDTLS_ERR_NET_CONN_RESET)
         {
-            cp_print_log(CP_LOG_LVL_ERROR, 1, " failed\n  ! peer closed the connection\n\n");
+            cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! peer closed the connection\n\n");
             break;
         }
 
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
-            cp_print_log(CP_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_write returned %d\n\n", ret);
+            cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_write returned %d\n\n", ret);
             break;
         }
     }
 
     write_len = ret;
-    cp_print_log(CP_LOG_LVL_ALL, 1, " %lu bytes written\n", write_len);
+    cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, " %lu bytes written\n", write_len);
 
     /* Returns written length or the error code */
     return ret;
@@ -849,7 +849,7 @@ static int ssl_send_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
 
     if (fp == NULL)
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "During SSL send, while opening the file: %s\n", file_path);
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "During SSL send, while opening the file: %s\n", file_path);
         goto exit;
     }
 
@@ -863,7 +863,7 @@ static int ssl_send_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
 
     if (ssl_write_data(p_ssl, file_buf, (str_padded_sz + 1)) != (str_padded_sz + 1))
     {
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "Cannot send the file-size properly\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot send the file-size properly\n");
         goto exit;
     }
 
@@ -876,7 +876,7 @@ static int ssl_send_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
 
         if (ret < 0)
         {
-            cp_print_log(CP_LOG_LVL_ERROR, 1, "Error while receiving the SYNC message from the enclave\n");
+            cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while receiving the SYNC message from the enclave\n");
             goto exit;
         }
     } while (ret == 0);
@@ -884,8 +884,8 @@ static int ssl_send_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
     send_sz = 0;
 
     if (padded_size > FILE_BUF_SZ){
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "File cannot be sent in optimized way\n");
-        cp_print_log(CP_LOG_LVL_ERROR, 1, "Later you can recompile the code with larger buffer size\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "File cannot be sent in optimized way\n");
+        cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Later you can recompile the code with larger buffer size\n");
 
         /* Send real data unless the file is completely sent */
         while (send_sz < file_sz)
@@ -900,7 +900,7 @@ static int ssl_send_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
 
                 if (ret < 0)
                 {
-                    cp_print_log(CP_LOG_LVL_ERROR, 1, "While sending the file: %s\n", file_path);
+                    cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "While sending the file: %s\n", file_path);
                     goto exit;
                 }
 
@@ -910,7 +910,7 @@ static int ssl_send_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
             send_sz += cur_send_sz;
         }
 
-        cp_print_log(CP_LOG_LVL_INFO, 1, "Successfully sent real file: %d bytes of file data to the receiver\n", send_sz);
+        cp_print_log(CP_LOG_LVL_INFO, 1, __func__, __LINE__, "Successfully sent real file: %d bytes of file data to the receiver\n", send_sz);
 
         /* Send dummy data till last 8 bytes, which will contain the real-size. 7-digit for the value and one charecter for the terminating '\0' */
         dummy_data_end = padded_size - 8;
@@ -921,7 +921,7 @@ static int ssl_send_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
 
             if (ret < 0)
             {
-                cp_print_log(CP_LOG_LVL_ERROR, 1, "While sending the file: %s\n", file_path);
+                cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "While sending the file: %s\n", file_path);
                 goto exit;
             }
 
@@ -934,11 +934,11 @@ static int ssl_send_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
         /* Send the real-size of the file */
         if (ssl_write_data(p_ssl, buf1, (str_sz + 1)) != (str_sz + 1))
         {
-            cp_print_log(CP_LOG_LVL_ERROR, 1, "Cannot send the real file-size properly\n");
+            cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot send the real file-size properly\n");
             goto exit;
         }
 
-        cp_print_log(CP_LOG_LVL_ALL, 1, "Sent file-size: %s\n", buf1);
+        cp_print_log(CP_LOG_LVL_ALL, 1, __func__, __LINE__, "Sent file-size: %s\n", buf1);
     } else {
         /* Send file in optimized way by reducing the number of ssl_write_data() */
         /* Write the file_sz in string format(7 digits and one NULL charecter) at the end */
@@ -950,7 +950,7 @@ static int ssl_send_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
             read_sz = fread(file_buf, 1, FILE_BUF_SZ, fp);
 
             if (read_sz < file_sz){
-                cp_print_log(CP_LOG_LVL_ERROR, 1, "It was expected that, entire file should have been read in single call\n");
+                cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "It was expected that, entire file should have been read in single call\n");
             } else {
                 /* Entire file is read in a single call */
                 /* Actual file size will be less than the padded size */
@@ -965,12 +965,12 @@ static int ssl_send_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
 
                 if (ret < 0)
                 {
-                    cp_print_log(CP_LOG_LVL_ERROR, 1, "While sending the file: %s\n", file_path);
+                    cp_print_log(CP_LOG_LVL_ERROR, 1, __func__, __LINE__, "While sending the file: %s\n", file_path);
                     goto exit;
                 }
 
                 if (ret != padded_size){
-                    cp_print_log(CP_LOG_LVL_INFO, 1, "Note entire file cannot be sent in single call, ret = %d, padded_size = %d, mbedtls_ssl_flush_output() returned: %d\n", ret, padded_size, mbedtls_ssl_flush_output(p_ssl));
+                    cp_print_log(CP_LOG_LVL_INFO, 1, __func__, __LINE__, "Note entire file cannot be sent in single call, ret = %d, padded_size = %d, mbedtls_ssl_flush_output() returned: %d\n", ret, padded_size, mbedtls_ssl_flush_output(p_ssl));
                 }
 
                 cur_send_sz += ret;
@@ -979,7 +979,7 @@ static int ssl_send_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
             send_sz += cur_send_sz;
         }
 
-        cp_print_log(CP_LOG_LVL_INFO, 1, "Successfully sent the padded file: %d bytes of file data to the receiver\n", send_sz);
+        cp_print_log(CP_LOG_LVL_INFO, 1, __func__, __LINE__, "Successfully sent the padded file: %d bytes of file data to the receiver\n", send_sz);
     }
 
     ret = 0;

@@ -1,8 +1,4 @@
-# Install Curl first
-sudo apt-get install -y curl
-
-# Install Gramine
-
+# Add essential repos
 sudo curl -fsSLo /usr/share/keyrings/gramine-keyring.gpg https://packages.gramineproject.io/gramine-keyring.gpg
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/gramine.list
 sudo curl -fsSLo /usr/share/keyrings/intel-sgx-deb.asc https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
@@ -11,6 +7,13 @@ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-sgx-deb.asc] https://d
 sleep 2
 sudo apt-get update
 sleep 2
+# Install build-essentials
+sudo apt install build-essential
+
+# Install Curl
+sudo apt-get install -y curl
+
+# Install Gramine
 sudo apt-get install -y gramine
 
 # Generate enclave signing-key

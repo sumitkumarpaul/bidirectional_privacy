@@ -49,7 +49,7 @@
 unsigned int SAVED_LOG_LVL;
 unsigned int ENCLAVE_LOG_LVL = ENC_DEF_LOG_LVL;
 
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 5
 
 #define CA_CRT_PATH "ssl/ca.crt"
 #define SRV_CRT_PATH "ssl/enclave.crt"
@@ -157,7 +157,7 @@ static int execute_SaveData(unsigned int *pdid);
 static int execute_PrepFrd(const char *DU_IP, const char *enc_port, int did, unsigned int rem_list[], unsigned int rem_list_sz);
 static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const char *CP_PORT);
 static int execute_SetKey();
-static void enclave_print_log(int enclave_dbg_lvl, int do_flush, const char *fmt, ...);
+static void enclave_print_log(int enclave_dbg_lvl, int do_flush, const char *func_name, unsigned int line, const char *fmt, ...);
 static void ssl_debug(void *ctx, int level, const char *file, int line, const char *str);
 static int ssl_client_connect(const char* IP, const char* port);
 static void ssl_client_close();
@@ -191,14 +191,14 @@ int main(int argc, char **argv)
 
     if (argc < 2)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Running instruction: [gramine-sgx] ./enclave <sgx/non-sgx> <local listening port>\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Running instruction: [gramine-sgx] ./enclave <sgx/non-sgx> <local listening port>\n");
     } else {
         if (!strcmp(argv[2], "sgx"))
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Running the enclave in sgx mode\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Running the enclave in sgx mode\n");
             g_in_sgx = true;
         } else {
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Running the enclave in non-sgx mode\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Running the enclave in non-sgx mode\n");
             
         }
     }
@@ -207,14 +207,14 @@ int main(int argc, char **argv)
 
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Failed to initialize the communication channel between the enclave and the outer world..!!\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed to initialize the communication channel between the enclave and the outer world..!!\n");
         goto exit;
     }
 
     execute_commands();
 
 exit:
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Destroying the enclave..!!\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Destroying the enclave..!!\n");
 
     com_ch_fin();
     fflush(stdout);
@@ -234,7 +234,7 @@ static int com_ch_init(const char *local_port)
 
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Failed setting up the local TCP communication interface with the hosting DU..!!\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed setting up the local TCP communication interface with the hosting DU..!!\n");
         goto exit;
     }
 
@@ -242,14 +242,14 @@ static int com_ch_init(const char *local_port)
 
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Failed to listen on the local TCP interface with DU..!!\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed to listen on the local TCP interface with DU..!!\n");
         goto exit;
     }
 
 exit:
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Destroying the local TCP interface with DU..!!\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Destroying the local TCP interface with DU..!!\n");
         com_ch_fin();
     }
 
@@ -279,14 +279,14 @@ static void execute_commands()
                             sizeof(attestation_type_str) - 1);
         if (ret < 0 && ret != -ENOENT)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "User requested RA-TLS attestation but cannot read SGX-specific file "
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "User requested RA-TLS attestation but cannot read SGX-specific file "
                                                       "/dev/attestation/attestation_type\n");
             g_in_sgx == false;
             return;
         }
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Listening for commands from local DU..\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Listening for commands from local DU..\n");
 
     while (1)
     {
@@ -294,15 +294,15 @@ static void execute_commands()
 
         if (ret <= 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error during command reception from DU. Error is: %d\n", ret);
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Stopping command processing..\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error during command reception from DU. Error is: %d\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Stopping command processing..\n");
             break;
         }
 
         /* Init is the combination of SetKey() and TEESetup() */
         if (strncmp(buf1, "Init", strlen("Init")) == 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Started executing Init\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Started executing Init\n");
 
             start_timing();
 
@@ -332,11 +332,11 @@ static void execute_commands()
 
             end_timing();
             
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Ended executing Init\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Ended executing Init\n");
         }
         else if (strncmp(buf1, "SetKey", strlen("SetKey")) == 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Started executing SetKey\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Started executing SetKey\n");
             
             start_timing();
             
@@ -353,7 +353,7 @@ static void execute_commands()
 
             end_timing();
 
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Ended executing SetKey\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Ended executing SetKey\n");
         }
         else if (strncmp(buf1, "TEESetup", strlen("TEESetup")) == 0)
         {
@@ -362,7 +362,7 @@ static void execute_commands()
             char CP_IP[] = "127.0.0.1";
             char CP_PORT[] = "4321";
 
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Started executing TEESetup\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Started executing TEESetup\n");
             start_timing();
             ret = execute_TEESetup(setup_filename, CP_IP, CP_PORT);
             
@@ -377,7 +377,7 @@ static void execute_commands()
             
             end_timing();
             
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Ended executing TEESetup\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Ended executing TEESetup\n");
         }
         else if (strncmp(buf1, "PrepFrd", strlen("PrepFrd")) == 0)
         {
@@ -388,7 +388,7 @@ static void execute_commands()
             char remote_enc_port[6];
 
             /* The command sould be something like "PrepFrd, <IP of remote DU>, <Listening port of remote enclave>, <did>, [list of IDs]" */
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Started executing PrepFrd\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Started executing PrepFrd\n");
 
             start_timing();
 
@@ -397,7 +397,7 @@ static void execute_commands()
 
             if (tok == NULL)
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Problem while parsing the \"PrepFrd\" command\n");
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Problem while parsing the \"PrepFrd\" command\n");
                 ret = -1;
             }
             else
@@ -407,7 +407,7 @@ static void execute_commands()
 
             if ((tok == NULL) || (ret == -1))
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Problem while parsing the IP of the remote DU\n");
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Problem while parsing the IP of the remote DU\n");
                 ret = -1;
             }
             else
@@ -418,7 +418,7 @@ static void execute_commands()
 
             if ((tok == NULL) || (ret == -1))
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Problem while parsing the port of the remote enclave\n");
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Problem while parsing the port of the remote enclave\n");
                 ret = -1;
             }
             else
@@ -429,7 +429,7 @@ static void execute_commands()
 
             if ((tok == NULL) || (ret == -1))
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Problem while parsing the did\n");
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Problem while parsing the did\n");
                 ret = -1;
             }
             else
@@ -440,7 +440,7 @@ static void execute_commands()
 
             if ((tok == NULL) || (ret == -1))
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Problem while parsing the start of PDS_{rem}[]\n");
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Problem while parsing the start of PDS_{rem}[]\n");
                 ret = -1;
             }
             else
@@ -452,7 +452,7 @@ static void execute_commands()
 
             if (ret != -1)
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_MIN, 1, "Forwarding data (did: %d) after removing: %d data processing statements\n", did, rem_list_sz);
+                enclave_print_log(ENCLAVE_LOG_LVL_MIN, 1, __func__, __LINE__, "Forwarding data (did: %d) after removing: %d data processing statements\n", did, rem_list_sz);
                 ret = execute_PrepFrd(remote_DU_IP, remote_enc_port, did, rem_list, rem_list_sz);
             }
 
@@ -467,7 +467,7 @@ static void execute_commands()
 
             end_timing();
 
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Ended executing PrepFrd\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Ended executing PrepFrd\n");
         }
         else if (strncmp(buf1, "SaveData", strlen("SaveData")) == 0)
         {
@@ -494,7 +494,7 @@ static void execute_commands()
             unsigned int did, S_ID;
             unsigned int result;
 
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Started executing Process\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Started executing Process\n");
             start_timing();
             
             /* First token is always "Process" */
@@ -502,7 +502,7 @@ static void execute_commands()
 
             if (tok == NULL)
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Problem while parsing the \"Process\" command\n");
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Problem while parsing the \"Process\" command\n");
                 ret = -1;
             }
             else
@@ -512,7 +512,7 @@ static void execute_commands()
 
             if ((tok == NULL) || (ret == -1))
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Problem while parsing the did\n");
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Problem while parsing the did\n");
                 ret = -1;
             }
             else
@@ -523,7 +523,7 @@ static void execute_commands()
 
             if ((tok == NULL) || (ret == -1))
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Problem while parsing the S_ID\n");
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Problem while parsing the S_ID\n");
                 ret = -1;
             }
             else
@@ -533,12 +533,12 @@ static void execute_commands()
 
             if (ret != -1)
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Starting execution: did = %d, S_ID = %d\n", did, S_ID);
+                enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Starting execution: did = %d, S_ID = %d\n", did, S_ID);
                 
                 /* For testing, use these parameters. Depending on the situation the content and number of data elements in xml file will change */
                 ret = execute_Process(did, S_ID, &result);
 
-                enclave_print_log(ENCLAVE_LOG_LVL_MIN, 1, "Processed data (did: %d) according to processing statement ID: %d, the result is: %u\n", did, S_ID, result);
+                enclave_print_log(ENCLAVE_LOG_LVL_MIN, 1, __func__, __LINE__, "Processed data (did: %d) according to processing statement ID: %d, the result is: %u\n", did, S_ID, result);
             }
 
             if (ret == 0)
@@ -552,19 +552,19 @@ static void execute_commands()
 
             end_timing();
 
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Ended executing Process\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Ended executing Process\n");
         }
         else if (strncmp(buf1, "Finalize", strlen("Finalize")) == 0)
         {
             char pathname[100];
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Received command for finalization of the enclave\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Received command for finalization of the enclave\n");
 
             {
                 /* Delete already received code */
                 for (int i = 0; i < num_rcvd_code; i++)
                 {
                     sprintf(pathname, "./enc/%d/code_%d.so", ssl_server_listening_port, i);
-                    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Removing the dynamic library file: %s\n", pathname);
+                    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Removing the dynamic library file: %s\n", pathname);
                     (void)remove(pathname);
                 }
             }
@@ -575,25 +575,25 @@ static void execute_commands()
                 {
                     /* Removing the D-files from enclave's storage*/
                     sprintf(pathname, "./enc/%d/D_%d.xml", ssl_server_listening_port, i);
-                    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Removing the D file: %s\n", pathname);
+                    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Removing the D file: %s\n", pathname);
                     (void)remove(pathname);
 
                     /* Remove the performance measurement related file as well */
                     if (g_in_sgx == false) {
                         /* Removing the D-files from enclave's storage*/
                         sprintf(pathname, "./enc/%d/D_%d.xml.enc", ssl_server_listening_port, i);
-                        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Removing the D file: %s\n", pathname);
+                        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Removing the D file: %s\n", pathname);
                         (void)remove(pathname);
                     }
 
                     /* Removing the PC-files from enclave's storage */
                     sprintf(pathname, "./enc/%d/PC_%d.xml", ssl_server_listening_port, i);
-                    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Removing thePC file: %s\n", pathname);
+                    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Removing thePC file: %s\n", pathname);
                     (void)remove(pathname);
 
                     /* Removing the PC-files from DU's storage */
                     sprintf(pathname, "./DU_storage/%d/PC_%d.xml", ssl_server_listening_port, i);
-                    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Removing the PC file: %s\n", pathname);
+                    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Removing the PC file: %s\n", pathname);
                     (void)remove(pathname);                  
                 }
             }
@@ -601,7 +601,7 @@ static void execute_commands()
             {
                 /* Remove performance log file */
                 sprintf(pathname, "./DU_storage/%d/enc_perf.log", ssl_server_listening_port);
-                enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Removing the performance log file: %s\n", pathname);
+                enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Removing the performance log file: %s\n", pathname);
                 (void)remove(pathname);                  
             }
 
@@ -611,7 +611,7 @@ static void execute_commands()
 
             /* Removing the FPC-files from DU's storage */
             sprintf(pathname, "./DU_storage/%d/FPC.xml", ssl_server_listening_port);
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Removing the FPC file: %s\n", pathname);
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Removing the FPC file: %s\n", pathname);
             (void)remove(pathname);  
 
             sprintf(pathname, "./DU_storage/%d/", ssl_server_listening_port);
@@ -621,7 +621,7 @@ static void execute_commands()
         }
         else
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Received unknown command: %s\n", buf1); // Sumit may happen buffer overflow
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Received unknown command: %s\n", buf1); // Sumit may happen buffer overflow
             ret = -1;
         }
 
@@ -645,11 +645,11 @@ static int lcl_du_if_init(const char *port)
 
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " failed\n  ! mbedtls_net_bind returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " failed\n  ! mbedtls_net_bind returned %d\n\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Successfully bounded the local interface with TCP port: %s\n", port);
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Successfully bounded the local interface with TCP port: %s\n", port);
 
     lcl_du_listening_port = atoi(port);
 exit:
@@ -658,7 +658,7 @@ exit:
 #ifdef MBEDTLS_ERROR_C
         char error_buf[100];
         mbedtls_strerror(ret, error_buf, sizeof(error_buf));
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Last error was: %d - %s\n\n", ret, error_buf);
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Last error was: %d - %s\n\n", ret, error_buf);
 #endif
         lcl_du_if_fin();
     }
@@ -705,7 +705,7 @@ static int ssl_server_init()
 
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "error: could not create the director: %s\n", saved_location_name);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "error: could not create the director: %s\n", saved_location_name);
         ret = -1;
         goto exit;
     }
@@ -720,7 +720,7 @@ static int ssl_server_init()
         ra_tls_attest_lib = dlopen("libra_tls_attest.so", RTLD_LAZY);
         if (!ra_tls_attest_lib)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "User requested RA-TLS attestation but cannot find lib\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "User requested RA-TLS attestation but cannot find lib\n");
             return 1;
         }
 
@@ -728,31 +728,31 @@ static int ssl_server_init()
         ra_tls_create_key_and_crt_der_f = dlsym(ra_tls_attest_lib, "ra_tls_create_key_and_crt_der");
         if ((error = dlerror()) != NULL)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "%s\n", error);
+            enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "%s\n", error);
             return 1;
         }
     }
     else
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Unrecognized remote attestation type: %s\n", attestation_type_str);
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Unrecognized remote attestation type: %s\n", attestation_type_str);
         return 1;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Seeding the random number generator...\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Seeding the random number generator...\n");
 
     ret = mbedtls_ctr_drbg_seed(&ssl_server_ctr_drbg, mbedtls_entropy_func, &ssl_server_entropy,
                                 (const unsigned char *)pers, strlen(pers));
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ctr_drbg_seed returned %d\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ctr_drbg_seed returned %d\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " ok\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
     if (ra_tls_attest_lib)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "\n  . Creating the RA-TLS enclave cert and key (using \"%s\" as "
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "\n  . Creating the RA-TLS enclave cert and key (using \"%s\" as "
                                                   "attestation type)...",
                           attestation_type_str);
 
@@ -762,14 +762,14 @@ static int ssl_server_init()
         ret = (*ra_tls_create_key_and_crt_der_f)(&der_key, &der_key_size, &der_crt, &der_crt_size);
         if (ret != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  !  ra_tls_create_key_and_crt_der returned %d\n\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  !  ra_tls_create_key_and_crt_der returned %d\n\n", ret);
             goto exit;
         }
 
         ret = mbedtls_x509_crt_parse(&ssl_server_srvcert, (unsigned char *)der_crt, der_crt_size);
         if (ret != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  !  mbedtls_x509_crt_parse returned %d\n\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  !  mbedtls_x509_crt_parse returned %d\n\n", ret);
             goto exit;
         }
 
@@ -777,25 +777,25 @@ static int ssl_server_init()
                                    mbedtls_ctr_drbg_random, &ssl_server_ctr_drbg);
         if (ret != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  !  mbedtls_pk_parse_key returned %d\n\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  !  mbedtls_pk_parse_key returned %d\n\n", ret);
             goto exit;
         }
     }
     else
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "\n  . Creating normal enclave cert and key...");
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "\n  . Creating normal enclave cert and key...");
 
         ret = mbedtls_x509_crt_parse_file(&ssl_server_srvcert, SRV_CRT_PATH);
         if (ret != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  !  mbedtls_x509_crt_parse_file returned %d\n\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  !  mbedtls_x509_crt_parse_file returned %d\n\n", ret);
             goto exit;
         }
 
         ret = mbedtls_x509_crt_parse_file(&ssl_server_srvcert, CA_CRT_PATH);
         if (ret != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  !  mbedtls_x509_crt_parse_file returned %d\n\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  !  mbedtls_x509_crt_parse_file returned %d\n\n", ret);
             goto exit;
         }
 
@@ -803,31 +803,31 @@ static int ssl_server_init()
                                        mbedtls_ctr_drbg_random, &ssl_server_ctr_drbg);
         if (ret != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  !  mbedtls_pk_parse_keyfile returned %d\n\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  !  mbedtls_pk_parse_keyfile returned %d\n\n", ret);
             goto exit;
         }
 
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " ok\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Bind on https://localhost:%s/ ...", port);
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Bind on https://localhost:%s/ ...", port);
 
     ret = mbedtls_net_bind(&ssl_server_listen_fd, NULL, port, MBEDTLS_NET_PROTO_TCP);
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_net_bind returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_net_bind returned %d\n\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " ok\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Setting up the SSL data....");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Setting up the SSL data....");
 
     ret = mbedtls_ssl_config_defaults(&ssl_server_conf, MBEDTLS_SSL_IS_SERVER, MBEDTLS_SSL_TRANSPORT_STREAM,
                                       MBEDTLS_SSL_PRESET_DEFAULT);
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_config_defaults returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_config_defaults returned %d\n\n", ret);
         goto exit;
     }
 
@@ -843,18 +843,18 @@ static int ssl_server_init()
     ret = mbedtls_ssl_conf_own_cert(&ssl_server_conf, &ssl_server_srvcert, &ssl_server_pkey);
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_conf_own_cert returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_conf_own_cert returned %d\n\n", ret);
         goto exit;
     }
 
     ret = mbedtls_ssl_setup(&ssl_server_ssl, &ssl_server_conf);
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_setup returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_setup returned %d\n\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " ok\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
 exit:
     if (ret != 0)
@@ -862,7 +862,7 @@ exit:
 #ifdef MBEDTLS_ERROR_C
         char error_buf[100];
         mbedtls_strerror(ret, error_buf, sizeof(error_buf));
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Last error was: %d - %s\n\n", ret, error_buf);
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Last error was: %d - %s\n\n", ret, error_buf);
 #endif
         ssl_server_fin();
     }
@@ -907,17 +907,17 @@ static int lcl_du_con_accept()
 
     mbedtls_net_init(&lcl_client_fd);
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Waiting for a connection with local DU...\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Waiting for a connection with local DU...\n");
 
     ret = mbedtls_net_accept(&lcl_listen_fd, &lcl_client_fd, NULL, 0, NULL);
 
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_net_accept returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_net_accept returned %d\n\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " Established TCP connection with local DU\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " Established TCP connection with local DU\n");
 
 exit:
     if (ret != 0)
@@ -925,7 +925,7 @@ exit:
 #ifdef MBEDTLS_ERROR_C
         char error_buf[100];
         mbedtls_strerror(ret, error_buf, sizeof(error_buf));
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Last error was: %d - %s\n\n", ret, error_buf);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Last error was: %d - %s\n\n", ret, error_buf);
 #endif
         lcl_du_con_close();
     }
@@ -951,31 +951,31 @@ static int ssl_server_con_accept()
 
     mbedtls_net_init(&ssl_server_client_fd);
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Waiting for a remote connection from a ssl client...");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Waiting for a remote connection from a ssl client...");
 
     ret = mbedtls_net_accept(&ssl_server_listen_fd, &ssl_server_client_fd, NULL, 0, NULL);
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_net_accept returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_net_accept returned %d\n\n", ret);
         goto exit;
     }
 
     mbedtls_ssl_set_bio(&ssl_server_ssl, &ssl_server_client_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " ok\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Performing the SSL/TLS handshake...");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Performing the SSL/TLS handshake...");
 
     while ((ret = mbedtls_ssl_handshake(&ssl_server_ssl)) != 0)
     {
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_handshake returned %d\n\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_handshake returned %d\n\n", ret);
             goto exit;
         }
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " Established SSL connection with remote ssl client\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " Established SSL connection with remote ssl client\n");
 
     ret = 0;
 
@@ -985,7 +985,7 @@ exit:
 #ifdef MBEDTLS_ERROR_C
         char error_buf[100];
         mbedtls_strerror(ret, error_buf, sizeof(error_buf));
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Last error was: %d - %s\n\n", ret, error_buf);
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Last error was: %d - %s\n\n", ret, error_buf);
 #endif
         ssl_server_con_close();
     }
@@ -997,7 +997,7 @@ exit:
 static void ssl_server_con_close()
 {
     int ret;
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Closing the ssl connection...\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Closing the ssl connection...\n");
 
     (void)mbedtls_ssl_close_notify(&ssl_server_ssl);
 
@@ -1016,7 +1016,7 @@ static int execute_SetKey()
 
     if (ENC_STATE != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot execute: %s, current state of enclave is: %d\n", __func__, ENC_STATE);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot execute: %s, current state of enclave is: %d\n", __func__, ENC_STATE);
         goto exit;
     }
 
@@ -1024,7 +1024,7 @@ static int execute_SetKey()
 
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Failed setting up the ssl communication interface with the remote parties..!!\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed setting up the ssl communication interface with the remote parties..!!\n");
         ssl_server_fin();
     }
 
@@ -1069,7 +1069,7 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
 
     if (ENC_STATE != 1)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot execute: %s, current state of enclave is: %d\n", __func__, ENC_STATE);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot execute: %s, current state of enclave is: %d\n", __func__, ENC_STATE);
         goto exit;
     }
 
@@ -1077,7 +1077,7 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
 
     if (ad_key_fp == NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot open: %s\n", AD_KEY_FNAME);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot open: %s\n", AD_KEY_FNAME);
         goto exit;
     }
 
@@ -1091,7 +1091,7 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
 
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "error: could not create the director: %s\n", saved_location_name);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "error: could not create the director: %s\n", saved_location_name);
         ret = -1;
         goto exit;
     }
@@ -1104,18 +1104,18 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
 
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed to connect with CP\n  ! mbedtls_net_connect returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed to connect with CP\n  ! mbedtls_net_connect returned %d\n\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, " Connected with CP\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, " Connected with CP\n");
 
     /*parse the file and get the DOM */
     doc = xmlReadFile(pds_file_name, NULL, 0);
 
     if (doc == NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "error: could not parse file %s\n", pds_file_name);
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "error: could not parse file %s\n", pds_file_name);
         ret = -1;
         goto exit;
     }
@@ -1132,7 +1132,7 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
         num_pd = xmlChildElementCount(node);
         pd_node = xmlFirstElementChild(node);
 
-        enclave_print_log(ENCLAVE_LOG_LVL_MIN, 1, "Started executing setup with: %d proposed data-processing statements\n", num_pd);
+        enclave_print_log(ENCLAVE_LOG_LVL_MIN, 1, __func__, __LINE__, "Started executing setup with: %d proposed data-processing statements\n", num_pd);
 
         for (i = 0; i < num_pd; i++)
         {
@@ -1144,14 +1144,14 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
             /* Note: Do not put any <space> in the command */
             req_sz = sprintf(buf1, "GetCode,%d,%s,%s", i, CP_IP, port);
 
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Warning: For experimental purpose, always request for code 0\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Warning: For experimental purpose, always request for code 0\n");
 
             /* Send request for a particular code over the TCP connection */
             ret = mbedtls_net_send(&cp_client_fd, buf1, req_sz);
 
             if (ret != req_sz)
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed to send request to CP during obtaing the code having id: %d\n  ! mbedtls_net_connect returned %d\n\n", i, ret);
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed to send request to CP during obtaing the code having id: %d\n  ! mbedtls_net_connect returned %d\n\n", i, ret);
                 goto exit;
             }
 
@@ -1162,19 +1162,19 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
 
                 if (ret < 0)
                 {
-                    enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed to accept connection returned %d\n\n", ret);
+                    enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed to accept connection returned %d\n\n", ret);
                     goto exit;
                 }
 
                 is_connected = 1;
 
-                enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, " Connected via SSL connection\n");
+                enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, " Connected via SSL connection\n");
             }
 
             /* Receive so-many files from CP */
             sprintf(saved_location_name, "./enc/%d/code_%d.so", ssl_server_listening_port, i);
 
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, " Started receiving file %s\n", saved_location_name);
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, " Started receiving file %s\n", saved_location_name);
            
             /* Receive the dynamic libary corresponding to S_ID */
             ret = ssl_recv_padded_file(&ssl_server_ssl, saved_location_name, &real_file_sz);
@@ -1183,7 +1183,7 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
             {
                 goto exit;
             }
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, " Receive complete\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, " Receive complete\n");
 
             /* TODO: Chance of performance improvement, receiving the chunk obin_to_hexf a file and simultaneously update of sha256 can be */
             mbedtls_sha256_starts(&sha256_ctx, 0); /* SHA-256, not 224 */
@@ -1196,7 +1196,7 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
 
             mbedtls_sha256_finish(&sha256_ctx, sha256_buf);
             bin_to_hex(sha256_buf, 32, file_buf);
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, " Hash calculation complete\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, " Hash calculation complete\n");
 
             /* First 64-bytes contains the hash of the code in hexa decimal format. The size of each statement is fixed and it is 500 butes */
             S_len = xmlStrlen(xmlNodeGetContent(S_node));
@@ -1212,11 +1212,11 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
             file_buf[S_len + 64] = 10;
             ret = S_VfB(file_buf, (S_len + 64 + 1), ad_pub_key_buf, ad_keylen, buf1, olen);
 
-            enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "AS-signature verification complete, return: %d\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "AS-signature verification complete, return: %d\n", ret);
 
             if (ret != 0)
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "For code: %s, return after verification of auditor's signature is: %d\n", i, ret);
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "For code: %s, return after verification of auditor's signature is: %d\n", i, ret);
                 goto exit;
             }
             else
@@ -1225,10 +1225,10 @@ static int execute_TEESetup(const char *pds_file_name, const char *CP_IP, const 
             }
 
             pd_node = xmlNextElementSibling(pd_node);
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, " Ended processing file %s\n", saved_location_name);
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, " Ended processing file %s\n", saved_location_name);
         }
 
-        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, " Received %d code components from the CP\n", num_rcvd_code);
+        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, " Received %d code components from the CP\n", num_rcvd_code);
     }
     else
     {
@@ -1280,17 +1280,17 @@ static int execute_PrepFrd(const char *DU_IP, const char *enc_port, int did, uns
 
     if (ENC_STATE != 2)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot execute: %s, current state of enclave is: %d\n", __func__, ENC_STATE);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot execute: %s, current state of enclave is: %d\n", __func__, ENC_STATE);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Started SSL connection establishment with child enclave\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Started SSL connection establishment with child enclave\n");
     ret = ssl_client_connect(DU_IP, enc_port);
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Competed SSL connection establishment with child enclave\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Competed SSL connection establishment with child enclave\n");
 
     if (ret < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 0, "Error while connecting with the enclave. Ret = %d\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 0, __func__, __LINE__, "Error while connecting with the enclave. Ret = %d\n", ret);
         goto exit;
     }
 
@@ -1301,31 +1301,31 @@ static int execute_PrepFrd(const char *DU_IP, const char *enc_port, int did, uns
     ret = file_copy(src_PC_fname, FPC_fname);
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "File copy problem, to: %s from: %s\n", src_PC_fname, FPC_fname);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "File copy problem, to: %s from: %s\n", src_PC_fname, FPC_fname);
         ret = -1;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "RSS-like redaction operation start\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "RSS-like redaction operation start\n");
     /* Remove the specified elements from the FPC and update FPC.SC */
     ret = prepare_FPC_file(FPC_fname, rem_list, rem_list_sz, src_D_fname);
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Problem during consent preparation\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Problem during consent preparation\n");
         ret = -1;
     }
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "RSS-like redaction operation end\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "RSS-like redaction operation end\n");
 
     ret = ssl_send_file(&ssl_client_ssl, src_D_fname);
     
     if (ret < 0) {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while sending D to the remote enclave\n");        
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while sending D to the remote enclave\n");        
         goto exit;
     }
 
     ret = ssl_send_file(&ssl_client_ssl, FPC_fname);
     
     if (ret < 0) {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while sending PC to the remote enclave\n");        
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while sending PC to the remote enclave\n");        
         goto exit;
     }
 
@@ -1336,18 +1336,18 @@ static int execute_PrepFrd(const char *DU_IP, const char *enc_port, int did, uns
 
         if (ret < 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while receiving the OK message from the enclave\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while receiving the OK message from the enclave\n");
             goto exit;
         }
     } while (ret == 0);
 
     if (strcmp(buf1, "OK\n") != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Received a message from the enclave, but that is not an OK message\n"); 
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Received a message from the enclave, but that is not an OK message\n"); 
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1,"Completed forwarding data\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__,"Completed forwarding data\n");
 
     ret = 0;
 
@@ -1366,22 +1366,22 @@ static int execute_SaveData(unsigned int *pdid)
 
     if (ENC_STATE != 2)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot execute: %s, current state of enclave is: %d\n", __func__, ENC_STATE);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot execute: %s, current state of enclave is: %d\n", __func__, ENC_STATE);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_MIN, 1, "Waiting for receiving the data and consent\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_MIN, 1, __func__, __LINE__, "Waiting for receiving the data and consent\n");
 
     ret = ssl_server_con_accept();
 
     if (ret < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while accepting the connection\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while accepting the connection\n");
         ret = -1;
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Receiving data-file\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Receiving data-file\n");
 
     sprintf(received_D_file, "./enc/%d/D_%d.xml", ssl_server_listening_port, next_did);
     sprintf(received_PC_file, "./enc/%d/PC_%d.xml", ssl_server_listening_port, next_did);
@@ -1393,7 +1393,7 @@ static int execute_SaveData(unsigned int *pdid)
 
     if (ret < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while receiving the data file\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while receiving the data file\n");
         ret = -1;
         goto exit;
     }
@@ -1406,31 +1406,31 @@ static int execute_SaveData(unsigned int *pdid)
         end_timing();
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Receiving pc-file\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Receiving pc-file\n");
 
     ret = ssl_recv_file(&ssl_server_ssl, received_PC_file);
 
     if (ret < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while receiving the consent file\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while receiving the consent file\n");
         ret = -1;
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "RSS-like verification operation start\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "RSS-like verification operation start\n");
 
     ret = VerifyAndSave();
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "RSS-like verification operation end\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "RSS-like verification operation end\n");
 
     if (ret < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error during verification of the received content\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error during verification of the received content\n");
         ret = -1;
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Successfully verified both the files\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Successfully verified both the files\n");
 
     sprintf(DU_PC_file, "./DU_storage/%d/PC_%d.xml", ssl_server_listening_port, next_did);
 
@@ -1438,7 +1438,7 @@ static int execute_SaveData(unsigned int *pdid)
     ret = file_copy(received_PC_file, DU_PC_file);
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "File copy problem, to: %s from: %s\n", received_PC_file, DU_PC_file);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "File copy problem, to: %s from: %s\n", received_PC_file, DU_PC_file);
         ret = -1;
         goto exit;
     }
@@ -1447,12 +1447,12 @@ static int execute_SaveData(unsigned int *pdid)
 
     if (ret < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error during returning OK message to the sender\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error during returning OK message to the sender\n");
         ret = -1;
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Successfully written OK message to the sender of these message\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Successfully written OK message to the sender of these message\n");
 
     *pdid = next_did;
     next_did++;
@@ -1486,43 +1486,43 @@ static int execute_Process(unsigned int did, unsigned int S_ID, unsigned int *re
     void *libp = NULL;
     char fname[100];
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Within the function: %s\n", __func__);
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Within the function: %s\n", __func__);
 
     if (ENC_STATE != 2)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot execute: %s, current state of enclave is: %d\n", __func__, ENC_STATE);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot execute: %s, current state of enclave is: %d\n", __func__, ENC_STATE);
         ret = -1;
         goto exit;
     }
 
     sprintf(fname, "./enc/%d/code_%d.so", ssl_server_listening_port, S_ID);
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Starting the dynamic library loading\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Starting the dynamic library loading\n");
 
     libp = dlopen(fname, RTLD_NOW|RTLD_NODELETE);
     
     if (libp == NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot open the dynamic library: %s\n", fname);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot open the dynamic library: %s\n", fname);
         ret = -1;
         goto exit;
     }
 
     fn_f = dlsym(libp, "fn");
     
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Ended the dynamic library loading\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Ended the dynamic library loading\n");
 
     if (fn_f == NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "The function fn is not found within the loaded library\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "The function fn is not found within the loaded library\n");
         ret = -1;
         goto exit;
     }
 
     if ((error = dlerror()) != NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "%s\n", error);
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot load the symbol from the dynamic library\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "%s\n", error);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot load the symbol from the dynamic library\n");
         ret = -1;
         goto exit;
     }
@@ -1539,16 +1539,16 @@ static int execute_Process(unsigned int did, unsigned int S_ID, unsigned int *re
     }    
 
     *result = fn_f(fname);
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Return from the function: %u\n", *result);
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Return from the function: %u\n", *result);
 
     ret = 0;
 
 exit:
     if (libp != NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Starting the dynamic library un-loading\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Starting the dynamic library un-loading\n");
         dlclose(libp);
-        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Ended the dynamic library un-loading\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Ended the dynamic library un-loading\n");
     }
 
     return ret;
@@ -1559,7 +1559,7 @@ exit:
 /// @param do_flush Whether to flush the print buffer immediately to the sceen(will make the execution slower)
 /// @param fmt The format specifier like printf()
 /// @param  The paramerts to be printed, just like printf()
-static void enclave_print_log(int enclave_dbg_lvl, int do_flush, const char *fmt, ...)
+static void enclave_print_log(int enclave_dbg_lvl, int do_flush, const char *func_name, unsigned int line, const char *fmt, ...)
 {
     int printed_size = 0;
     struct timezone tz;
@@ -1574,7 +1574,7 @@ static void enclave_print_log(int enclave_dbg_lvl, int do_flush, const char *fmt
 
         if (now != NULL)
         {
-            printed_size = snprintf(print_buf, PRINT_BUF_SZ, "[ENC: %07d]\t[%02d-%02d-%04d %02d:%02d:%02d.%06ld] ", eid, now->tm_mday, (now->tm_mon + 1), (now->tm_year + 1900), now->tm_hour, now->tm_min, now->tm_sec, tv.tv_usec);
+            printed_size = snprintf(print_buf, PRINT_BUF_SZ, "[CP]\t\t[%02d-%02d-%04d %02d:%02d:%02d.%06ld] %s() Line:%04u: ", now->tm_mday, (now->tm_mon + 1), (now->tm_year + 1900), now->tm_hour, now->tm_min, now->tm_sec, tv.tv_usec, func_name, line);
         }
 
         va_start(ap, fmt);
@@ -1645,9 +1645,9 @@ static int ssl_client_connect(const char* IP, const char* port)
         ra_tls_verify_lib = dlopen("libra_tls_verify_dcap_gramine.so", RTLD_LAZY);
         if (!ra_tls_verify_lib)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "%s\n", dlerror());
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "User requested RA-TLS verification with DCAP inside SGX but cannot find lib\n");
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Please make sure that you are using client_dcap.manifest\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "%s\n", dlerror());
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "User requested RA-TLS verification with DCAP inside SGX but cannot find lib\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Please make sure that you are using client_dcap.manifest\n");
             return 1;
         }
     }
@@ -1658,18 +1658,18 @@ static int ssl_client_connect(const char* IP, const char* port)
                                                       "ra_tls_verify_callback_extended_der");
         if ((error = dlerror()) != NULL)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "%s\n", error);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "%s\n", error);
             return 1;
         }
 
         ra_tls_set_measurement_callback_f = dlsym(ra_tls_verify_lib, "ra_tls_set_measurement_callback");
         if ((error = dlerror()) != NULL)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "%s\n", error);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "%s\n", error);
             return 1;
         }
 
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "[ using our own SGX-measurement verification callback"
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "[ using our own SGX-measurement verification callback"
                                                   " (via command line options) ]\n");
 
         g_verify_mrenclave = true;
@@ -1681,69 +1681,69 @@ static int ssl_client_connect(const char* IP, const char* port)
     }
     else if (ra_tls_verify_lib)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "[ using default SGX-measurement verification callback"
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "[ using default SGX-measurement verification callback"
                                                   " (via RA_TLS_* environment variables) ]\n");
         (*ra_tls_set_measurement_callback_f)(NULL); /* just to test RA-TLS code */
     }
     else
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "[ Non-sgx mode, instead of RA-TLS, using normal TLS flows ]\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "[ Non-sgx mode, instead of RA-TLS, using normal TLS flows ]\n");
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "\n  . Seeding the random number generator...");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "\n  . Seeding the random number generator...");
 
     ret = mbedtls_ctr_drbg_seed(&ssl_client_ctr_drbg, mbedtls_entropy_func, &ssl_client_entropy,
                                 (const unsigned char *)pers, strlen(pers));
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ctr_drbg_seed returned %d\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ctr_drbg_seed returned %d\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " ok\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Connecting to tcp/%s/%s...", IP, port);
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Connecting to tcp/%s/%s...", IP, port);
 
     ret = mbedtls_net_connect(&ssl_client_server_fd, IP, port, MBEDTLS_NET_PROTO_TCP);
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_net_connect returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_net_connect returned %d\n\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " ok\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Setting up the SSL/TLS structure...");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Setting up the SSL/TLS structure...");
 
     ret = mbedtls_ssl_config_defaults(&ssl_client_conf, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM,
                                       MBEDTLS_SSL_PRESET_DEFAULT);
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_config_defaults returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_config_defaults returned %d\n\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " ok\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Loading the CA root certificate ...");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Loading the CA root certificate ...");
 
     ret = mbedtls_x509_crt_parse_file(&ssl_client_cacert, CA_CRT_PATH);
     if (ret < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  !  mbedtls_x509_crt_parse_file returned -0x%x\n\n", -ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  !  mbedtls_x509_crt_parse_file returned -0x%x\n\n", -ret);
         goto exit;
     }
 
     mbedtls_ssl_conf_authmode(&ssl_client_conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
     mbedtls_ssl_conf_ca_chain(&ssl_client_conf, &ssl_client_cacert, NULL);
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " ok\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
     if (ra_tls_verify_lib)
     {
         /* use RA-TLS verification callback; this will overwrite CA chain set up above */
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Installing RA-TLS callback ...");
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Installing RA-TLS callback ...");
         mbedtls_ssl_conf_verify(&ssl_client_conf, &my_verify_callback, &my_verify_callback_results);
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " ok\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
     }
 
     mbedtls_ssl_conf_rng(&ssl_client_conf, mbedtls_ctr_drbg_random, &ssl_client_ctr_drbg);
@@ -1752,54 +1752,54 @@ static int ssl_client_connect(const char* IP, const char* port)
     ret = mbedtls_ssl_setup(&ssl_client_ssl, &ssl_client_conf);
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_setup returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_setup returned %d\n\n", ret);
         goto exit;
     }
 
     ret = mbedtls_ssl_set_hostname(&ssl_client_ssl, IP);
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_set_hostname returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_set_hostname returned %d\n\n", ret);
         goto exit;
     }
 
     mbedtls_ssl_set_bio(&ssl_client_ssl, &ssl_client_server_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Performing the SSL/TLS handshake...");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Performing the SSL/TLS handshake...");
 
     while ((ret = mbedtls_ssl_handshake(&ssl_client_ssl)) != 0)
     {
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_handshake returned -0x%x\n", -ret);
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "  ! ra_tls_verify_callback_results:\n"
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_handshake returned -0x%x\n", -ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "  ! ra_tls_verify_callback_results:\n"
                                                         "    attestation_scheme=%d, err_loc=%d, \n",
                               my_verify_callback_results.attestation_scheme,
                               my_verify_callback_results.err_loc);
             switch (my_verify_callback_results.attestation_scheme)
             {
             case RA_TLS_ATTESTATION_SCHEME_EPID:
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "    epid.ias_enclave_quote_status=%s\n\n",
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "    epid.ias_enclave_quote_status=%s\n\n",
                                   my_verify_callback_results.epid.ias_enclave_quote_status);
                 break;
             case RA_TLS_ATTESTATION_SCHEME_DCAP:
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "    dcap.func_verify_quote_result=0x%x, "
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "    dcap.func_verify_quote_result=0x%x, "
                                                             "dcap.quote_verification_result=0x%x\n\n",
                                   my_verify_callback_results.dcap.func_verify_quote_result,
                                   my_verify_callback_results.dcap.quote_verification_result);
                     if (my_verify_callback_results.err_loc == 3) {
-                        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1,"!!!!! Probably the environment variables are not set on the terminal\n");
+                        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__,"!!!!! Probably the environment variables are not set on the terminal\n");
                     }
                     else if (my_verify_callback_results.err_loc == 5) {
-                        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1,"!!!!! Probably the code is not compiled with correct details of the enclave\n");
+                        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__,"!!!!! Probably the code is not compiled with correct details of the enclave\n");
                     }
                     else {
-                        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1,"Unknown reason\n");
+                        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__,"Unknown reason\n");
                     }                    
 
                 break;
             default:
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "  ! unknown attestation scheme!\n\n");
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "  ! unknown attestation scheme!\n\n");
                 break;
             }
 
@@ -1807,24 +1807,24 @@ static int ssl_client_connect(const char* IP, const char* port)
         }
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " ok\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Verifying peer X.509 certificate...");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Verifying peer X.509 certificate...");
 
     flags = mbedtls_ssl_get_verify_result(&ssl_client_ssl);
     if (flags != 0)
     {
         char vrfy_buf[512];
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " failed\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " failed\n");
         mbedtls_x509_crt_verify_info(vrfy_buf, sizeof(vrfy_buf), "  ! ", flags);
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "%s\n", vrfy_buf);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "%s\n", vrfy_buf);
 
         /* verification failed for whatever reason, fail loudly */
         goto exit;
     }
     else
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " ok\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " ok\n");
     }
 
     exit_code = EXIT_SUCCESS;
@@ -1834,7 +1834,7 @@ exit:
     {
         char error_buf[100];
         mbedtls_strerror(ret, error_buf, sizeof(error_buf));
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Last error was: %d - %s\n\n", ret, error_buf);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Last error was: %d - %s\n\n", ret, error_buf);
         ssl_client_close();
     }
 #endif
@@ -1928,7 +1928,7 @@ static int my_verify_callback(void *data, mbedtls_x509_crt *crt, int depth, uint
 /// @brief When acting as the parent DU, it acts as client. Finalizes that client.
 static void ssl_client_close()
 {
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  . Closing the connection...\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  . Closing the connection...\n");
 
     (void)mbedtls_ssl_close_notify(&ssl_server_ssl);
 
@@ -1956,7 +1956,7 @@ static int ssl_read_data(mbedtls_ssl_context *p_ssl, char *read_buf, int max_rea
     int ret = -1;
     int len = max_read_len - 1;
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  < Reading data from established ssl connection:");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  < Reading data from established ssl connection:");
     memset(read_buf, 0, max_read_len);
 
     do
@@ -1970,7 +1970,7 @@ static int ssl_read_data(mbedtls_ssl_context *p_ssl, char *read_buf, int max_rea
         ret = mbedtls_ssl_read(p_ssl, read_buf, len);
 
         if (ret == MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_WRITE){
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Wants read-write more\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Wants read-write more\n");
             continue;
         }
 
@@ -1979,28 +1979,28 @@ static int ssl_read_data(mbedtls_ssl_context *p_ssl, char *read_buf, int max_rea
             switch (ret)
             {
             case MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY:
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " connection was closed gracefully\n");
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " connection was closed gracefully\n");
                 break;
 
             case MBEDTLS_ERR_NET_CONN_RESET:
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " connection was reset by peer\n");
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " connection was reset by peer\n");
                 break;
 
             default:
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " mbedtls_ssl_read returned -0x%x\n", -ret);
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " mbedtls_ssl_read returned -0x%x\n", -ret);
                 break;
             }
 
             break;
         } else if (ret == 0){
             /* 0 size may be obtained for ack from other end */
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, " mbedtls_ssl_read received 0 bytes message\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, " mbedtls_ssl_read received 0 bytes message\n");
             break;
         }
 
         len = ret;
 
-        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, " %lu bytes read\n", len);
+        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, " %lu bytes read\n", len);
 
         if (ret > 0)
             break;
@@ -2021,25 +2021,25 @@ static int ssl_write_data(mbedtls_ssl_context *p_ssl, char *write_buf, int write
     int ret;
     int written_len;
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "  > Write data to established ssl connection:");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "  > Write data to established ssl connection:");
 
     while ((ret = mbedtls_ssl_write(p_ssl, write_buf, write_len)) <= 0)
     {
         if (ret == MBEDTLS_ERR_NET_CONN_RESET)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! peer closed the connection\n\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! peer closed the connection\n\n");
             break;
         }
 
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ssl_write returned %d\n\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ssl_write returned %d\n\n", ret);
             break;
         }
     }
 
     write_len = ret;
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, " %lu bytes written\n", write_len);
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, " %lu bytes written\n", write_len);
 
     /* Returns written length or the error code */
     return ret;
@@ -2065,14 +2065,14 @@ static ssize_t read_dev_file(const char *path, char *buf, size_t count)
     {
         int errsv = errno;
         fclose(f);
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error during file read: %d\n", -errsv);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error during file read: %d\n", -errsv);
         return -errsv;
     }
 
     int close_ret = fclose(f);
     if (close_ret < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error during file close: %d\n", -errno);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error during file close: %d\n", -errno);
         return -errno;
     }
 
@@ -2090,7 +2090,7 @@ static ssize_t write_dev_file(const char *path, char *buf, size_t count)
     FILE *f = fopen(path, "a");
     if (!f)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error during file open: %d\n", -errno);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error during file open: %d\n", -errno);
         return -errno;
     }
 
@@ -2101,7 +2101,7 @@ static ssize_t write_dev_file(const char *path, char *buf, size_t count)
     {
         int errsv = errno;
         fclose(f);
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error during file write: %d\n", -errsv);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error during file write: %d\n", -errsv);
         return -errsv;
     }
 
@@ -2110,7 +2110,7 @@ static ssize_t write_dev_file(const char *path, char *buf, size_t count)
     int close_ret = fclose(f);
     if (close_ret < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error during file close: %d\n", -errno);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error during file close: %d\n", -errno);
         return -errno;
     }
 
@@ -2136,7 +2136,7 @@ static int ssl_send_file(mbedtls_ssl_context *p_ssl, const char *file_path)
 
     if (fp == NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "During SSL send, while opening the file: %s\n", file_path);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "During SSL send, while opening the file: %s\n", file_path);
         goto exit;
     }
 
@@ -2150,7 +2150,7 @@ static int ssl_send_file(mbedtls_ssl_context *p_ssl, const char *file_path)
 
     if (ssl_write_data(p_ssl, buf1, (str_sz + 1)) != (str_sz + 1))
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot send the file-size properly\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot send the file-size properly\n");
         goto exit;
     }
 
@@ -2163,7 +2163,7 @@ static int ssl_send_file(mbedtls_ssl_context *p_ssl, const char *file_path)
 
         if (ret < 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while receiving the SYNC message from the enclave\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while receiving the SYNC message from the enclave\n");
             goto exit;
         }
     } while (ret == 0);
@@ -2182,7 +2182,7 @@ static int ssl_send_file(mbedtls_ssl_context *p_ssl, const char *file_path)
 
             if (ret < 0)
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "While sending the file: %s\n", file_path);
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "While sending the file: %s\n", file_path);
                 goto exit;
             }
 
@@ -2192,7 +2192,7 @@ static int ssl_send_file(mbedtls_ssl_context *p_ssl, const char *file_path)
         send_sz += cur_send_sz;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Successfully sent: %d bytes of file data to the receiver\n", send_sz);
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Successfully sent: %d bytes of file data to the receiver\n", send_sz);
 
     ret = 0;
 
@@ -2221,13 +2221,13 @@ static int ssl_recv_file(mbedtls_ssl_context *p_ssl, const char *file_path)
     FILE *fp;
     mbedtls_sha256_context ctx2;
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Started receiving the file: %s\n", file_path);
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Started receiving the file: %s\n", file_path);
 
     fp = fopen(file_path, "wb");
 
     if (fp == NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "While creating the file: %s\n", file_path);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "While creating the file: %s\n", file_path);
         goto exit;
     }
 
@@ -2244,31 +2244,31 @@ static int ssl_recv_file(mbedtls_ssl_context *p_ssl, const char *file_path)
 
         if (ret < 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error(= %d) while receiving the SYNC message from the receiver\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error(= %d) while receiving the SYNC message from the receiver\n", ret);
             goto exit;
         }
         else if (ret == 0){
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Read data size = %d\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Read data size = %d\n", ret);
         }
     } while (ret == 0);
 
     file_sz = atoi(buf1);
     if (file_sz < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Receiving file size is < 0\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Receiving file size is < 0\n");
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Read the file size, which is: %d\n", file_sz);
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Read the file size, which is: %d\n", file_sz);
     
     /* Send-back a single byte sync message to the server after receiving the file size */
     if (mbedtls_ssl_write(p_ssl, buf1, 1) < 1)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Problem while sending the SYNC message, during file-transfer\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Problem while sending the SYNC message, during file-transfer\n");
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Written sync message successfully\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Written sync message successfully\n");
 
     recv_sz = 0;
 
@@ -2283,13 +2283,13 @@ static int ssl_recv_file(mbedtls_ssl_context *p_ssl, const char *file_path)
 
         if (cur_recv_sz < 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Problem while receiving data for the file: %d\n", cur_recv_sz);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Problem while receiving data for the file: %d\n", cur_recv_sz);
             goto exit;
         }
 
         cur_write_sz = 0;
 
-        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Received file data size: %d\n", cur_recv_sz);
+        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Received file data size: %d\n", cur_recv_sz);
 
         while (cur_recv_sz != cur_write_sz)
         {
@@ -2297,7 +2297,7 @@ static int ssl_recv_file(mbedtls_ssl_context *p_ssl, const char *file_path)
 
             if (ret < 0)
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while writing to the file: %d\n", ret);
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while writing to the file: %d\n", ret);
                 goto exit;
             }
 
@@ -2307,7 +2307,7 @@ static int ssl_recv_file(mbedtls_ssl_context *p_ssl, const char *file_path)
         recv_sz += cur_recv_sz;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Successfully received file having size: %d bytes\n", recv_sz);
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Successfully received file having size: %d bytes\n", recv_sz);
 
     ret = 0;
 
@@ -2358,7 +2358,7 @@ static int file_copy(const char *source_file, const char *target_file)
 
     if (source == NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot open: %s\n", source_file);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot open: %s\n", source_file);
         goto exit;
     }
 
@@ -2370,7 +2370,7 @@ static int file_copy(const char *source_file, const char *target_file)
 
     if (target == NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot open: %s\n", target_file);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot open: %s\n", target_file);
         goto exit;
     }
 
@@ -2381,7 +2381,7 @@ static int file_copy(const char *source_file, const char *target_file)
 
         if (read_sz != write_sz)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Read and write size are different\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Read and write size are different\n");
             goto exit;
         }
 
@@ -2414,11 +2414,11 @@ static int sha256_file(const char *file_path, mbedtls_sha256_context *ctx, unsig
 
     fp = fopen(file_path, "rb");
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Real file size: %d\n", real_file_sz);
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Real file size: %d\n", real_file_sz);
 
     if (fp == NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "During SHA256 calculation, cannot open the file: %s\n", file_path);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "During SHA256 calculation, cannot open the file: %s\n", file_path);
         goto exit;
     }
 
@@ -2442,7 +2442,7 @@ static int sha256_file(const char *file_path, mbedtls_sha256_context *ctx, unsig
 
         if (cur_read_sz <= 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot read the file: %s\n", file_path);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot read the file: %s\n", file_path);
             goto exit;
         }
 
@@ -2501,7 +2501,7 @@ static int ssl_recv_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
 
     if (fp == NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "While creating the file: %s\n", file_path);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "While creating the file: %s\n", file_path);
         goto exit;
     }
 
@@ -2517,27 +2517,27 @@ static int ssl_recv_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
         ret = mbedtls_ssl_read(p_ssl, buf1, BUF1_SZ);
         if (ret < 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error(= %d) while receiving the SYNC message from the receiver\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error(= %d) while receiving the SYNC message from the receiver\n", ret);
             goto exit;
         }
         else if (ret == 0){
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Read data size = %d\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Read data size = %d\n", ret);
         }
     } while (ret == 0);
 
     file_sz = atoi(buf1);
     if (file_sz < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Receiving file size is < 0\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Receiving file size is < 0\n");
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Read the file size, which is: %d\n", file_sz);
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Read the file size, which is: %d\n", file_sz);
 
     /* Send-back a single byte sync message to the server after receiving the file size */
     if (mbedtls_ssl_write(p_ssl, buf1, 1) < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Problem while sending the SYNC message, during file-transfer\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Problem while sending the SYNC message, during file-transfer\n");
         goto exit;
     }
 
@@ -2553,7 +2553,7 @@ static int ssl_recv_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
 
         if (cur_recv_sz < 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Problem while receiving data for the file: %d\n", cur_recv_sz);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Problem while receiving data for the file: %d\n", cur_recv_sz);
             goto exit;
         }
 
@@ -2565,7 +2565,7 @@ static int ssl_recv_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
 
             if (ret < 0)
             {
-                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while writing to the file: %d\n", ret);
+                enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while writing to the file: %d\n", ret);
                 goto exit;
             }
 
@@ -2575,29 +2575,29 @@ static int ssl_recv_padded_file(mbedtls_ssl_context *p_ssl, const char *file_pat
         recv_sz += cur_recv_sz;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Successfully received file having size: %d bytes\n", recv_sz);
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Successfully received file having size: %d bytes\n", recv_sz);
 
     ret = fseek(fp, (file_sz - 8), SEEK_SET);
 
     if (ret < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while trying to feek(), to read file's real size, ret: %d\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while trying to feek(), to read file's real size, ret: %d\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Before reading last 8-bytes of the file\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Before reading last 8-bytes of the file\n");
 
     /* Read last 8 bytes */
     ret = fread(buf1, 1, 8, fp);
 
     if (ret <= 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while trying to fread(), to read file's real size, ret: %d\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while trying to fread(), to read file's real size, ret: %d\n", ret);
         goto exit;
     }
 
     *p_real_file_sz = atoi(buf1);
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "File's real size is: %d\n", *p_real_file_sz);
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "File's real size is: %d\n", *p_real_file_sz);
 
     ret = 0;
 
@@ -2656,7 +2656,7 @@ static xmlNode *xml_get_element_by_path(xmlNode *root, xmlChar *path)
 
                         if (children_num > max_children_num)
                         {
-                            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Not enough number of children nodes. Expected :%d, has: %d\n", children_num, max_children_num);
+                            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Not enough number of children nodes. Expected :%d, has: %d\n", children_num, max_children_num);
                             break;
                         }
 
@@ -2715,20 +2715,20 @@ static int VerifyAndSave()
 
     if (ret < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot calculate the hash of the received data-file\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot calculate the hash of the received data-file\n");
         goto exit;
     }
 
     bin_to_hex(sha256_buf, 32, sha256_buf_hex);
     sha256_buf_hex[64] = '\0'; // For printing purpose only
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "SHA-256 of received D-file: %s\n", sha256_buf_hex);
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "SHA-256 of received D-file: %s\n", sha256_buf_hex);
 
     /* Parse the file and get the DOM */
     PC_file_doc = xmlReadFile(received_PC_file, NULL, 0);
 
     if (PC_file_doc == NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "error: could not parse file %s\n", received_PC_file);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "error: could not parse file %s\n", received_PC_file);
         ret = -1;
         goto exit;
     }
@@ -2737,7 +2737,7 @@ static int VerifyAndSave()
     PC_file_root_element = xmlDocGetRootElement(PC_file_doc);
     if (PC_file_root_element == NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "error: could not find the root of the file %s\n", received_PC_file);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "error: could not find the root of the file %s\n", received_PC_file);
         ret = -1;
         goto exit;
     }
@@ -2747,7 +2747,7 @@ static int VerifyAndSave()
 
     if (D_file_doc == NULL)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "error: could not parse file %s\n", received_D_file);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "error: could not parse file %s\n", received_D_file);
         ret = -1;
         goto exit;
     }
@@ -2760,7 +2760,7 @@ static int VerifyAndSave()
         PC_file_node = xml_get_element_by_path(PC_file_root_element, xmlPath);
         if (strncmp(sha256_buf_hex, xmlNodeGetContent(PC_file_node), 64) != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "error: PC.DH != H(D)\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "error: PC.DH != H(D)\n");
             ret = -1;
             goto exit;
         }
@@ -2782,11 +2782,11 @@ static int VerifyAndSave()
         ret = AE_Enc_buf(buf1, fresh_pk_len + 1, known_pattern, sizeof(known_pattern), ctxt_buf, &clen, sizeof(ctxt_buf));
         if (ret != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Encryption error, using PC.VK\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Encryption error, using PC.VK\n");
             ret = -1;
             goto exit;
         }
-        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Encryption successfully using PC.VK, clen = %d\n", clen);
+        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Encryption successfully using PC.VK, clen = %d\n", clen);
 
         /* Decrypt with D.CSK */
         strcpy(xmlPath, "D/CSK");
@@ -2797,16 +2797,16 @@ static int VerifyAndSave()
         ret = AE_Dec_buf(buf2, fresh_sk_len + 1, ctxt_buf, clen, ptxt_buf, &plen, sizeof(ptxt_buf));
         if (ret != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Decryption error, using D.CSK\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Decryption error, using D.CSK\n");
             ret = -1;
             goto exit;
         }
-        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Decrypted successfully using D.CSK\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Decrypted successfully using D.CSK\n");
 
         /* Comare whether the original data can be retrieved */
         if (strncmp(ptxt_buf, known_pattern, sizeof(known_pattern)) != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "error: PC.VK and D.CSK are not linked together\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "error: PC.VK and D.CSK are not linked together\n");
             ret = -1;
             goto exit;
         }
@@ -2821,7 +2821,7 @@ static int VerifyAndSave()
         buf_sz = read_all_children(D_file_node, file_buf, FILE_BUF_SZ);
         if (buf_sz < 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error during reading D.DS[]\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error during reading D.DS[]\n");
             ret = -1;
             goto exit;
         }
@@ -2831,7 +2831,7 @@ static int VerifyAndSave()
 
         /* For printing purpose only, the NULL charecter is added */
         file_buf[buf_sz] = '\0';
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "D.DS[]|PC.VK: %s\n", file_buf);
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "D.DS[]|PC.VK: %s\n", file_buf);
 
         /* Retrieve: D.DOC */
         strcpy(xmlPath, "D/DOC");
@@ -2846,21 +2846,21 @@ static int VerifyAndSave()
         ret = mbedtls_base64_decode(signature_buf, 256, &sig_len, xmlNodeGetContent(D_file_node), strlen(xmlNodeGetContent(D_file_node)));
         if (ret != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot decode the signature D.DOS as base64 format\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot decode the signature D.DOS as base64 format\n");
             ret = -1;
             goto exit;
         }
 
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Recovered signature D.DOS and its size is: %d\n", sig_len);
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Recovered signature D.DOS and its size is: %d\n", sig_len);
 
         /* Verify D.DOS with D.DOC */
         ret = S_VfB(file_buf, buf_sz, buf2, DO_pk_len + 1, signature_buf, sig_len);
 
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Return after calling S_VfB: %d\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Return after calling S_VfB: %d\n", ret);
 
         if (ret != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while verifying D.DOS with D.DOC: %d\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while verifying D.DOS with D.DOC: %d\n", ret);
             goto exit;
         }
     }
@@ -2874,7 +2874,7 @@ static int VerifyAndSave()
         buf_sz = read_all_children(PC_file_node, file_buf, FILE_BUF_SZ);
         if (buf_sz < 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error during reading D.DS[]\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error during reading D.DS[]\n");
             ret = -1;
             goto exit;
         }
@@ -2887,7 +2887,7 @@ static int VerifyAndSave()
 
         /* For printing purpose only, the NULL charecter is added */
         file_buf[buf_sz] = '\0';
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "PC.PDS[]|PC.DH: %s\n", file_buf);
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "PC.PDS[]|PC.DH: %s\n", file_buf);
 
         /* Retrieve: PC.SC */
         strcpy(xmlPath, "PC/SC");
@@ -2895,21 +2895,21 @@ static int VerifyAndSave()
         ret = mbedtls_base64_decode(signature_buf, 256, &sig_len, xmlNodeGetContent(PC_file_node), strlen(xmlNodeGetContent(PC_file_node)));
         if (ret != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot decode the signature PS.SC as base64 format\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot decode the signature PS.SC as base64 format\n");
             ret = -1;
             goto exit;
         }
 
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Recovered signature PS.SC and its size is: %d\n", sig_len);
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Recovered signature PS.SC and its size is: %d\n", sig_len);
 
         /* Verify PC.SC with PC.VK */
         ret = S_VfB(file_buf, buf_sz, buf1, fresh_pk_len + 1, signature_buf, sig_len);
 
-        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Return after calling S_VfB: %d\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Return after calling S_VfB: %d\n", ret);
 
         if (ret != 0)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while verifying PC.SC with PC.VK: %d\n", ret);
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while verifying PC.SC with PC.VK: %d\n", ret);
             goto exit;
         }
     }
@@ -2962,7 +2962,7 @@ static int AE_Kgen(char *pk_buf, size_t pk_buf_sz, size_t *o_pk_sz, char *sk_buf
     const char *pers = "rsa_genkey";
     *o_pk_sz = *o_sk_sz = 0;
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Seeding the random number generator for the key-generation...\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Seeding the random number generator for the key-generation...\n");
 
     mbedtls_pk_init(&key);
 
@@ -2974,41 +2974,41 @@ static int AE_Kgen(char *pk_buf, size_t pk_buf_sz, size_t *o_pk_sz, char *sk_buf
                                      (const unsigned char *)pers,
                                      strlen(pers))) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ctr_drbg_seed returned -0x%04x\n",
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ctr_drbg_seed returned -0x%04x\n",
                           (unsigned int)-ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Generating the RSA key [ %d-bit, exponent: %d ]...\n", RSA_KEY_SZ, RSA_KEY_EXP);
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Generating the RSA key [ %d-bit, exponent: %d ]...\n", RSA_KEY_SZ, RSA_KEY_EXP);
 
     if ((ret = mbedtls_pk_setup(&key, mbedtls_pk_info_from_type((mbedtls_pk_type_t)MBEDTLS_PK_RSA))) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  !  mbedtls_pk_setup returned -0x%04x", (unsigned int)-ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  !  mbedtls_pk_setup returned -0x%04x", (unsigned int)-ret);
         goto exit;
     }
 
     if ((ret = mbedtls_rsa_gen_key(mbedtls_pk_rsa(key), mbedtls_ctr_drbg_random, &ctr_drbg, RSA_KEY_SZ, RSA_KEY_EXP)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_rsa_gen_key returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_rsa_gen_key returned %d\n\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Exporting the public key in the pem buffer\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Exporting the public key in the pem buffer\n");
 
     if ((ret = mbedtls_pk_write_pubkey_pem(&key, pk_buf, pk_buf_sz)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_pk_write_pubkey_pem returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_pk_write_pubkey_pem returned %d\n\n", ret);
         goto exit;
     }
 
     /* Add 1 for the trailing null charecter */
     *o_pk_sz = (strlen(pk_buf) + 1);
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Exporting the secret key in the pem buffer\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Exporting the secret key in the pem buffer\n");
 
     if ((ret = mbedtls_pk_write_key_pem(&key, sk_buf, sk_buf_sz)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_pk_write_key_pem returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_pk_write_key_pem returned %d\n\n", ret);
         goto exit;
     }
 
@@ -3047,7 +3047,7 @@ static int AE_Enc_buf(const char *pk_buf,
 
     ret = -1;
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Seeding the random number generator for encryption\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Seeding the random number generator for encryption\n");
 
     mbedtls_ctr_drbg_init(&ctr_drbg);
 
@@ -3057,7 +3057,7 @@ static int AE_Enc_buf(const char *pk_buf,
                                      (const unsigned char *)pers,
                                      strlen(pers))) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ctr_drbg_seed returned -0x%x\n", -ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ctr_drbg_seed returned -0x%x\n", -ret);
         goto exit;
     }
 
@@ -3065,19 +3065,19 @@ static int AE_Enc_buf(const char *pk_buf,
 
     if ((ret = mbedtls_pk_parse_public_key(&pk, pk_buf, pk_sz)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_pk_parse_public_key returned -0x%x\n", -ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_pk_parse_public_key returned -0x%x\n", -ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Starting encryption\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Starting encryption\n");
 
     if ((ret = mbedtls_pk_encrypt(&pk, input, ilen, output, olen, max_olen, mbedtls_ctr_drbg_random, &ctr_drbg)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_pk_encrypt returned -0x%x\n", -ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_pk_encrypt returned -0x%x\n", -ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Encryption successful...ciphertext size = %d\n", *olen);
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Encryption successful...ciphertext size = %d\n", *olen);
 
 exit:
     mbedtls_ctr_drbg_free(&ctr_drbg);
@@ -3088,7 +3088,7 @@ exit:
     if (ret != 0)
     {
         mbedtls_strerror(ret, (char *)buf1, BUF1_SZ);
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "  !  Last error was: %s\n", buf1);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "  !  Last error was: %s\n", buf1);
     }
 #endif
 
@@ -3119,7 +3119,7 @@ static int AE_Dec_buf(const char *sk_buf,
 
     ret = -1;
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Seeding the random number generator for decryption purpose\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Seeding the random number generator for decryption purpose\n");
 
     mbedtls_ctr_drbg_init(&ctr_drbg);
 
@@ -3128,7 +3128,7 @@ static int AE_Dec_buf(const char *sk_buf,
                                      (const unsigned char *)pers,
                                      strlen(pers))) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ctr_drbg_seed returned -0x%x\n", -ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ctr_drbg_seed returned -0x%x\n", -ret);
         goto exit;
     }
 
@@ -3136,19 +3136,19 @@ static int AE_Dec_buf(const char *sk_buf,
 
     if ((ret = mbedtls_pk_parse_key(&pk, sk_buf, sk_sz, NULL, 0, mbedtls_ctr_drbg_random, &ctr_drbg)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_pk_parse_key returned -0x%x\n", -ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_pk_parse_key returned -0x%x\n", -ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Starting decryption\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Starting decryption\n");
 
     if ((ret = mbedtls_pk_decrypt(&pk, input, ilen, output, olen, max_olen, mbedtls_ctr_drbg_random, &ctr_drbg)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_pk_decrypt returned -0x%x\n", -ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_pk_decrypt returned -0x%x\n", -ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "Decryption successful...plaintext size = %d, plaintext: %s\n", *olen, output);
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "Decryption successful...plaintext size = %d, plaintext: %s\n", *olen, output);
 
 exit:
     mbedtls_ctr_drbg_free(&ctr_drbg);
@@ -3159,7 +3159,7 @@ exit:
     if (ret != 0)
     {
         mbedtls_strerror(ret, (char *)buf2, BUF2_SZ);
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "  !  Last error was: %s\n", buf2);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "  !  Last error was: %s\n", buf2);
     }
 #endif
 
@@ -3186,45 +3186,45 @@ static int S_SigH(char *hash_buf, const unsigned char *pri_key_buf, size_t keyle
     mbedtls_pk_init(&pk);             // TODO: One single pk init can be done for enclave's key-pair
     mbedtls_ctr_drbg_init(&ctr_drbg); // TODO: One single drbg init can be done for the enclave
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "\n  . Seeding the random number generator for signing the buffer...");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "\n  . Seeding the random number generator for signing the buffer...");
 
     if ((ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
                                      (const unsigned char *)pers,
                                      strlen(pers))) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_ctr_drbg_seed returned %d\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_ctr_drbg_seed returned %d\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "\n  . Reading private key from the buffer\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "\n  . Reading private key from the buffer\n");
 
     if ((ret = mbedtls_pk_parse_key(&pk, (unsigned char *)pri_key_buf, keylen, /*pwd=*/NULL, 0, mbedtls_ctr_drbg_random, NULL)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! Could not read key\n");
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "  ! mbedtls_pk_parse_key returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! Could not read key\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "  ! mbedtls_pk_parse_key returned %d\n\n", ret);
         goto exit;
     }
 
     if (!mbedtls_pk_can_do(&pk, MBEDTLS_PK_RSA))
     {
         ret = 1;
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! Key is not an RSA key\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! Key is not an RSA key\n");
         goto exit;
     }
 
     /* Use PKCS_V15 format to make it compatible with linux command */
     mbedtls_rsa_set_padding(mbedtls_pk_rsa(pk), MBEDTLS_RSA_PKCS_V15, MBEDTLS_MD_SHA256);
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "\n  . Generating the RSA/SHA-256 signature");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "\n  . Generating the RSA/SHA-256 signature");
 
     if ((ret = mbedtls_pk_sign(&pk, MBEDTLS_MD_SHA256, hash_buf, 32, sign_buf, MBEDTLS_PK_SIGNATURE_MAX_SIZE, p_olen,
                                mbedtls_ctr_drbg_random, &ctr_drbg)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_pk_sign returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_pk_sign returned %d\n\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "\n  . Signature successful\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "\n  . Signature successful\n");
 
 exit:
     mbedtls_pk_free(&pk);
@@ -3252,7 +3252,7 @@ static int S_SigB(const char *data_buf, size_t data_sz, const unsigned char *pri
 
     ret = S_SigH(hash, pri_key_buf, keylen, sign_buf, p_olen);
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Return from signature generation call: %d\n", ret);
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Return from signature generation call: %d\n", ret);
 
     return ret;
 }
@@ -3271,12 +3271,12 @@ static int S_SigF(const char *data_fname, const unsigned char *pri_key_buf, size
 
     if ((ret = mbedtls_md_file(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), data_fname, hash)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! Could not calculate the hash of the file: %s\n\n", data_fname);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! Could not calculate the hash of the file: %s\n\n", data_fname);
     }
     else
     {
         ret = S_SigH(hash, pri_key_buf, keylen, sign_buf, p_olen);
-        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Return from signature generation call: %d\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Return from signature generation call: %d\n", ret);
     }
 
     return ret;
@@ -3299,18 +3299,18 @@ static int S_VfH(char *hash_buf, const unsigned char *pub_key_buf, size_t keylen
 
     mbedtls_pk_init(&pk);
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "\n  . Reading public key\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "\n  . Reading public key\n");
 
     if ((ret = mbedtls_pk_parse_public_key(&pk, pub_key_buf, keylen)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! Could not read key\n");
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "  ! mbedtls_pk_parse_public_keyfile returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! Could not read key\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "  ! mbedtls_pk_parse_public_keyfile returned %d\n\n", ret);
         goto exit;
     }
 
     if (!mbedtls_pk_can_do(&pk, MBEDTLS_PK_RSA))
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! Key is not an RSA key\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! Key is not an RSA key\n");
         goto exit;
     }
 
@@ -3319,7 +3319,7 @@ static int S_VfH(char *hash_buf, const unsigned char *pub_key_buf, size_t keylen
                                        MBEDTLS_RSA_PKCS_V15,
                                        MBEDTLS_MD_SHA256)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! Invalid padding\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! Invalid padding\n");
         goto exit;
     }
 
@@ -3327,15 +3327,15 @@ static int S_VfH(char *hash_buf, const unsigned char *pub_key_buf, size_t keylen
      * Compute the SHA-256 hash of the input file and
      * verify the signature
      */
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "\n  . Verifying the RSA/SHA-256 signature");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "\n  . Verifying the RSA/SHA-256 signature");
     if ((ret = mbedtls_pk_verify(&pk, MBEDTLS_MD_SHA256, hash_buf, 32,
                                  sign_buf, sign_sz)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! mbedtls_pk_verify returned %d\n\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! mbedtls_pk_verify returned %d\n\n", ret);
         goto exit;
     }
 
-    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, "\n  . OK (the signature is valid)\n\n");
+    enclave_print_log(ENCLAVE_LOG_LVL_ALL, 1, __func__, __LINE__, "\n  . OK (the signature is valid)\n\n");
 
     exit_code = 0;
 
@@ -3363,7 +3363,7 @@ static int S_VfB(const char *data_buf, size_t data_sz, const unsigned char *pub_
 
     ret = S_VfH(hash, pub_key_buf, keylen, sign_buf, sign_sz);
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Return from signature (of size = %d) verification call: %d\n", sign_sz, ret);
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Return from signature (of size = %d) verification call: %d\n", sign_sz, ret);
 
     return ret;
 }
@@ -3382,12 +3382,12 @@ static int S_VfF(const char *data_fname, const unsigned char *pub_key_buf, size_
 
     if ((ret = mbedtls_md_file(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), data_fname, hash)) != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, " failed\n  ! Could not calculate the hash of the file: %s\n\n", data_fname);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, " failed\n  ! Could not calculate the hash of the file: %s\n\n", data_fname);
     }
     else
     {
         ret = S_VfH(hash, pub_key_buf, keylen, sign_buf, sign_sz);
-        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, "Return from signature verification call: %d\n", ret);
+        enclave_print_log(ENCLAVE_LOG_LVL_INFO, 0, __func__, __LINE__, "Return from signature verification call: %d\n", ret);
     }
 
     return ret;
@@ -3417,7 +3417,7 @@ static int read_all_children(xmlNode *node, char *buf, size_t max_buf_siz)
 
         if ((written_sz + cur_node_len + 1) > max_buf_siz)
         {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "No more space in the buffer\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "No more space in the buffer\n");
             goto exit;
         }
 
@@ -3519,13 +3519,13 @@ static int prepare_FPC_file(char *FPC_fname, unsigned int rem_list[], unsigned i
     size_t sig_len;
     size_t b64_sig_len;
 
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Removing %d elements from: %s\n", rem_list_sz, FPC_fname);
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Removing %d elements from: %s\n", rem_list_sz, FPC_fname);
 
     /* Parse the file and get the DOM */
     FPC_file_doc = xmlReadFile(FPC_fname, NULL, 0);
    
     if (FPC_file_doc == NULL) {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "error: could not parse file %s\n", FPC_fname);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "error: could not parse file %s\n", FPC_fname);
         ret = -1;
 	    goto exit;        
     }
@@ -3533,7 +3533,7 @@ static int prepare_FPC_file(char *FPC_fname, unsigned int rem_list[], unsigned i
     /* Get the root element node */
     FPC_file_root_element = xmlDocGetRootElement(FPC_file_doc);
     if (FPC_file_root_element == NULL) {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "error: could not find the root of the file %s\n", FPC_fname);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "error: could not find the root of the file %s\n", FPC_fname);
         ret = -1;
 	    goto exit;        
     }
@@ -3551,7 +3551,7 @@ static int prepare_FPC_file(char *FPC_fname, unsigned int rem_list[], unsigned i
     {
         /* Make 1-indexed values to 0-indexed values */
         if ((rem_list[j] - 1) == i){
-            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Removing element: %d\n", rem_list[j]);
+            enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Removing element: %d\n", rem_list[j]);
             del_node = cur_node;
             cur_node = xmlNextElementSibling(cur_node);
             xmlUnlinkNode(del_node);
@@ -3560,7 +3560,7 @@ static int prepare_FPC_file(char *FPC_fname, unsigned int rem_list[], unsigned i
         } else if ((rem_list[j] - 1) > i) {
             cur_node = xmlNextElementSibling(cur_node);
         } else {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Code should not come here..!!\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Code should not come here..!!\n");
             j++;
             cur_node = xmlNextElementSibling(cur_node);            
         }
@@ -3570,7 +3570,7 @@ static int prepare_FPC_file(char *FPC_fname, unsigned int rem_list[], unsigned i
     D_file_doc = xmlReadFile(D_fname, NULL, 0);
    
     if (D_file_doc == NULL) {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "error: could not parse file %s\n", D_fname);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "error: could not parse file %s\n", D_fname);
         ret = -1;
 	    goto exit;        
     }
@@ -3580,7 +3580,7 @@ static int prepare_FPC_file(char *FPC_fname, unsigned int rem_list[], unsigned i
     buf_sz = read_all_children(FPC_file_node, file_buf, FILE_BUF_SZ);
     if (buf_sz < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error during reading: %s\n", FPC_fname);
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error during reading: %s\n", FPC_fname);
         ret = -1;
         goto exit;
     }
@@ -3598,7 +3598,7 @@ static int prepare_FPC_file(char *FPC_fname, unsigned int rem_list[], unsigned i
     ret = S_SigB(file_buf, buf_sz, xmlNodeGetContent(D_file_node), strlen(xmlNodeGetContent(D_file_node)) + 1, signature_buf, &sig_len);
     if (ret < 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Error while creating signature with freshly generated private-key\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Error while creating signature with freshly generated private-key\n");
         ret = -1;
         goto exit;
     }
@@ -3606,7 +3606,7 @@ static int prepare_FPC_file(char *FPC_fname, unsigned int rem_list[], unsigned i
     ret = mbedtls_base64_encode(buf1, BUF1_SZ, &b64_sig_len, signature_buf, sig_len);
     if (ret != 0)
     {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Cannot convert the generated signature with freshly generated private-key to base64 format\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Cannot convert the generated signature with freshly generated private-key to base64 format\n");
         ret = -1;
         goto exit;
     }
@@ -3642,7 +3642,7 @@ static void start_timing()
         gettimeofday(&start_tv, &tz);
         timing_measurement_state = TIMING_MEASUREMENT_STARTED;
     } else {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Previous timing measurement has not finished yet\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Previous timing measurement has not finished yet\n");
     }
 
     return;
@@ -3670,10 +3670,10 @@ static void end_timing()
 
             fclose(perf_log_fp);
         } else {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Log file pointer is NULL\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Log file pointer is NULL\n");
         }
     } else {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Timing measurement has not started yet\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Timing measurement has not started yet\n");
     }
     return;
 }
@@ -3688,21 +3688,21 @@ static void aes_encrypt_file(const char *input_filename, const char *output_file
     
     // Set the AES encryption key
     if(mbedtls_aes_setkey_enc(&aes, key, 256) != 0) {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Failed to set AES key.\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed to set AES key.\n");
         return;
     }
 
     // Open the input file
     f = fopen(input_filename, "rb");
     if (!f) {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Failed to open input file.\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed to open input file.\n");
         return;
     }
 
     // Open the output file
     fout = fopen(output_filename, "wb");
     if (!fout) {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Failed to open output file.\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed to open output file.\n");
         fclose(f);
         return;
     }
@@ -3715,7 +3715,7 @@ static void aes_encrypt_file(const char *input_filename, const char *output_file
         }
 
         if (mbedtls_aes_crypt_cbc(&aes, MBEDTLS_AES_ENCRYPT, AES_BLK_SZ, iv, aes_input_blk, aes_output_blk) != 0) {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Failed to encrypt.\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed to encrypt.\n");
             fclose(f);
             fclose(fout);
             return;
@@ -3743,28 +3743,28 @@ static void aes_decrypt_file(const char *input_filename, const char *output_file
 
     // Set the AES decryption key
     if(mbedtls_aes_setkey_dec(&aes, key, 256) != 0) {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Failed to set AES key.\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed to set AES key.\n");
         return;
     }
     
     // Open the input file
     f = fopen(input_filename, "rb");
     if (!f) {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Failed to open input file.\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed to open input file.\n");
         return;
     }
 
     // Open the output file
     fout = fopen(output_filename, "wb");
     if (!fout) {
-        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Failed to open output file.\n");
+        enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed to open output file.\n");
         fclose(f);
         return;
     }
   
     while ((read = fread(aes_input_blk, 1, AES_BLK_SZ, f)) > 0) {
         if (mbedtls_aes_crypt_cbc(&aes, MBEDTLS_AES_DECRYPT, AES_BLK_SZ, iv, aes_input_blk, aes_output_blk) != 0) {
-            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, "Failed to decrypt.\n");
+            enclave_print_log(ENCLAVE_LOG_LVL_ERROR, 1, __func__, __LINE__, "Failed to decrypt.\n");
             fclose(f);
             fclose(fout);
             return;
@@ -3780,11 +3780,11 @@ static void aes_decrypt_file(const char *input_filename, const char *output_file
     fseek(f, 0, SEEK_END); // seek to end of file
     file_sz = ftell(f);    // get current file pointer
     fseek(f, 0, SEEK_SET); // seek back to beginning of file    
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Encrypted file(%s) size: %d\n", input_filename, file_sz);
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Encrypted file(%s) size: %d\n", input_filename, file_sz);
     fseek(fout, 0, SEEK_END); // seek to end of file
     file_sz = ftell(fout);    // get current file pointer
     fseek(fout, 0, SEEK_SET); // seek back to beginning of file
-    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, "Decrypted file(%s) size: %d\n", output_filename, file_sz);
+    enclave_print_log(ENCLAVE_LOG_LVL_INFO, 1, __func__, __LINE__, "Decrypted file(%s) size: %d\n", output_filename, file_sz);
 
 
     // Clean up
