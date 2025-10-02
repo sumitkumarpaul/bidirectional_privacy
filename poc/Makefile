@@ -19,7 +19,7 @@ RA_CLIENT_SPID ?=
 RA_CLIENT_LINKABLE ?= 0
 
 .PHONY: all
-all: do eclv du cp
+all: enclave do eclv du cp
 
 .PHONY: do
 do: data_owner
@@ -148,7 +148,7 @@ check_dcap_fail: app dcap
 .PHONY: clean
 clean:
 	$(RM) -r \
-		*.token *.sig *.manifest.sgx *.manifest data_user data_owner code_provider client *.so.* enc/received_code/*.so enc/*.xml OUTPUT
+		*.token *.sig *.manifest.sgx *.manifest enclave data_user data_owner code_provider client *.so.* enc/received_code/*.so enc/*.xml OUTPUT
 		#*.token *.sig *.manifest.sgx *.manifest enclave client *.so *.so.* OUTPUT
 
 .PHONY: distclean

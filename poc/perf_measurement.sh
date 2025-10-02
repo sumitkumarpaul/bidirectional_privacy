@@ -69,14 +69,14 @@ Setup_perf() {
   # Ensure that the involved parties are not running at the moment
   sudo killall code_provider > /dev/null 2>&1
 
-  if [ "$sgx_support" = "N" ]; then
+  if [ "$sgx_support" = "n" ]; then
     sudo killall enclave > /dev/null 2>&1
   else
     sudo killall gramine-sgx > /dev/null 2>&1
   fi
 
   # Run CP in demon mode and save its PID
-  if [ "$sgx_support" = "N" ]; then
+  if [ "$sgx_support" = "n" ]; then
     ./code_provider $CP_PORT non-sgx&
   else
     ./code_provider $CP_PORT sgx&
@@ -105,7 +105,7 @@ Setup_perf() {
         TCPDUMP_PID=$(Start_net_bytes_cap $ENC1_SSL_PORT)
       fi
       
-      if [ "$sgx_support" = "N" ]; then
+      if [ "$sgx_support" = "n" ]; then
         ./enclave $ENC1_PORT non-sgx  > /dev/null 2>&1&
       else
         gramine-sgx ./enclave $ENC1_PORT sgx  > /dev/null 2>&1&
@@ -155,14 +155,14 @@ SndOrgData_perf() {
   sudo killall code_provider > /dev/null 2>&1
   sudo killall data_owner > /dev/null 2>&1
 
-  if [ "$sgx_support" = "N" ]; then
+  if [ "$sgx_support" = "n" ]; then
     sudo killall enclave > /dev/null 2>&1
   else
     sudo killall gramine-sgx > /dev/null 2>&1
   fi
 
   # Run CP in demon mode and save its PID
-  if [ "$sgx_support" = "N" ]; then
+  if [ "$sgx_support" = "n" ]; then
     ./code_provider $CP_PORT non-sgx&
   else
     ./code_provider $CP_PORT sgx&
@@ -173,7 +173,7 @@ SndOrgData_perf() {
   # Setup the enclave first, use #PD = 100
   cp ${pds_file[4]} pds.xml
 
-  if [ "$sgx_support" = "N" ]; then
+  if [ "$sgx_support" = "n" ]; then
     ./enclave $ENC1_PORT non-sgx  > /dev/null 2>&1&
   else
     gramine-sgx ./enclave $ENC1_PORT sgx > /dev/null 2>&1&
@@ -216,7 +216,7 @@ SndOrgData_perf() {
       # Give some time to the receiving enclave to stabalize
       sleep 1
   
-      if [ "$sgx_support" = "N" ]; then
+      if [ "$sgx_support" = "n" ]; then
         ./data_owner $def_d_file ${pds_file[$i]} $do_sk $do_pk 127.0.0.1 $ENC1_SSL_PORT non-sgx
       else
         ./data_owner $def_d_file ${pds_file[$i]} $do_sk $do_pk 127.0.0.1 $ENC1_SSL_PORT sgx
@@ -267,7 +267,7 @@ SndOrgData_perf() {
       # Give some time to the receiving enclave to stabalize
       sleep 1
 
-      if [ "$sgx_support" = "N" ]; then
+      if [ "$sgx_support" = "n" ]; then
         ./data_owner ${d_file[$i]} $def_pds_file $do_sk $do_pk 127.0.0.1 $ENC1_SSL_PORT non-sgx
       else
         ./data_owner ${d_file[$i]} $def_pds_file $do_sk $do_pk 127.0.0.1 $ENC1_SSL_PORT sgx
@@ -313,14 +313,14 @@ ForwardData_perf() {
   sudo killall code_provider > /dev/null 2>&1
   sudo killall data_owner > /dev/null 2>&1
 
-  if [ "$sgx_support" = "N" ]; then
+  if [ "$sgx_support" = "n" ]; then
     sudo killall enclave > /dev/null 2>&1
   else
     sudo killall gramine-sgx > /dev/null 2>&1
   fi
   
   # Run CP in demon mode and save its PID
-  if [ "$sgx_support" = "N" ]; then
+  if [ "$sgx_support" = "n" ]; then
     ./code_provider $CP_PORT non-sgx&
   else
     ./code_provider $CP_PORT sgx&
@@ -331,7 +331,7 @@ ForwardData_perf() {
   # Setup the sending enclave first, use #PD = 100
   cp ${pds_file[4]} pds.xml
 
-  if [ "$sgx_support" = "N" ]; then
+  if [ "$sgx_support" = "n" ]; then
     ./enclave $ENC1_PORT non-sgx > /dev/null 2>&1&
   else
     gramine-sgx ./enclave $ENC1_PORT sgx  > /dev/null 2>&1&
@@ -359,7 +359,7 @@ ForwardData_perf() {
     # Give some time to the receiving enclave to stabalize
     sleep 1
     
-    if [ "$sgx_support" = "N" ]; then
+    if [ "$sgx_support" = "n" ]; then
       ./data_owner $def_d_file ${pds_file[$i]} $do_sk $do_pk 127.0.0.1 $ENC1_SSL_PORT non-sgx
     else
       ./data_owner $def_d_file ${pds_file[$i]} $do_sk $do_pk 127.0.0.1 $ENC1_SSL_PORT sgx
@@ -380,7 +380,7 @@ ForwardData_perf() {
     # Give some time to the receiving enclave to stabalize
     sleep 1
 
-    if [ "$sgx_support" = "N" ]; then
+    if [ "$sgx_support" = "n" ]; then
       ./data_owner ${d_file[$i]} $def_pds_file $do_sk $do_pk 127.0.0.1 $ENC1_SSL_PORT non-sgx
     else
       ./data_owner ${d_file[$i]} $def_pds_file $do_sk $do_pk 127.0.0.1 $ENC1_SSL_PORT
@@ -396,7 +396,7 @@ ForwardData_perf() {
   # Setup the receiving enclave, use #PD = 100
   cp ${pds_file[4]} pds.xml
 
-  if [ "$sgx_support" = "N" ]; then
+  if [ "$sgx_support" = "n" ]; then
     ./enclave $ENC2_PORT non-sgx > /dev/null 2>&1&
   else
     gramine-sgx ./enclave $ENC2_PORT sgx > /dev/null 2>&1&
@@ -647,14 +647,14 @@ ProcessData_perf() {
   sudo killall code_provider > /dev/null 2>&1
   sudo killall data_owner > /dev/null 2>&1
 
-  if [ "$sgx_support" = "N" ]; then
+  if [ "$sgx_support" = "n" ]; then
     sudo killall enclave > /dev/null 2>&1
   else
     sudo killall gramine-sgx > /dev/null 2>&1
   fi
 
   # Run CP in demon mode and save its PID
-  if [ "$sgx_support" = "N" ]; then
+  if [ "$sgx_support" = "n" ]; then
     ./code_provider $CP_PORT non-sgx&
   else
     ./code_provider $CP_PORT sgx&
@@ -665,7 +665,7 @@ ProcessData_perf() {
   # Setup the sending enclave first, use #PD = 100
   cp ${pds_file[4]} pds.xml
 
-  if [ "$sgx_support" = "N" ]; then
+  if [ "$sgx_support" = "n" ]; then
     ./enclave $ENC1_PORT non-sgx > /dev/null 2>&1&
   else
     gramine-sgx ./enclave $ENC1_PORT sgx  > /dev/null 2>&1&
@@ -693,7 +693,7 @@ ProcessData_perf() {
     # Give some time to the receiving enclave to stabalize
     sleep 1
 
-    if [ "$sgx_support" = "N" ]; then
+    if [ "$sgx_support" = "n" ]; then
       ./data_owner ${d_file[$i]} $def_pds_file $do_sk $do_pk 127.0.0.1 $ENC1_SSL_PORT non-sgx
     else
       ./data_owner ${d_file[$i]} $def_pds_file $do_sk $do_pk 127.0.0.1 $ENC1_SSL_PORT sgx
@@ -769,7 +769,7 @@ ProcessData_perf() {
 if [[ $# < 2 ]]
 then
     read -p 'Number of iterations for each experiment: ' num_itr
-    read -p 'Do you have sgx support? [Y / N] ' sgx_support
+    read -p 'Do you have sgx support? [(Y) / N] ' sgx_support
 else
     num_itr=$1
     sgx_support=$2
@@ -790,7 +790,7 @@ echo -e "Please wait, it will take considerable amount of time..."
 echo -e "============================================================================================================" >> $report_file
 echo -e "Measured average BPPM performance parameters of after running each combinations for: $num_itr-times" >> $report_file
 
-if [ "$sgx_support" = "N" ]; then
+if [ "$sgx_support" = "n" ]; then
   echo -e "Note: The performance is measured for non-sgx mode only. It does not provide all the privacy guarntee." >> $report_file
   echo -e "Note: Performance measured with sgx mode, typically takes more time, but provides all the stated privacy properties." >> $report_file
 fi
