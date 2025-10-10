@@ -138,9 +138,12 @@ The involved parites must print the transcript in the terminal. On success, the 
 
 ```
 :
-[ENC: 0002810]  [23-05-2024 19:27:13.709301] Waiting for receiving the data and consent
-[ENC: 0002763]  [23-05-2024 19:27:14.711234] Forwarding data (did: 0) after removing: 20 data processing statements
-[ENC: 0002810]  [23-05-2024 19:27:14.902936] Processed data (did: 0) according to processing statement ID: 1, the result is: 793406281
+
+:
+[CP]            [10-10-2025 20:42:05.051047] execute_commands() Line:0541: Processed data (did: 0) according to processing statement ID: 0, the result is: 978416187
+[CP]            [10-10-2025 20:42:05.052197] execute_SaveData() Line:1385: Waiting for receiving the data and consent
+[CP]            [10-10-2025 20:42:06.053181] execute_commands() Line:0455: Forwarding data (did: 0) after removing: 20 data processing statements
+[CP]            [10-10-2025 20:42:07.141615] execute_commands() Line:0541: Processed data (did: 0) according to processing statement ID: 1, the result is: 793406281
 ```
 Due to the use of non-uptodate collateral, some additional print from Microsoft Azure may come like the following:
 
@@ -169,7 +172,7 @@ export AZDCAP_COLLATERAL_VERSION=v3
 Then run the following script in the terminal, and follow the on-terminal instructions.
 
 ```
-./perf_measurement.sh 100 n
+./perf_measurement.sh 100 Y
 ```
 
 It will take a long time. Maybe 6-8 hours. On success it should show something like the following.
@@ -178,7 +181,7 @@ It will take a long time. Maybe 6-8 hours. On success it should show something l
 ============================================================================================================
 Started performance measurement of BPPM
 Please wait, it will take considerable amount of time...
-
+:
 Performance measurement completed..!! Open the folder Perf_log_<DD>_<MM>_<YYYY>_<HH>-<MM>-<SS>/ for detailed reports.
 ============================================================================================================
 ```
